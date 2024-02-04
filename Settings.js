@@ -5,7 +5,6 @@ class Settings {
         this.settings = this.loadSettings();
     }
 
-
     loadSettings() {
         const filePath = './data/settings.json';
 
@@ -18,7 +17,6 @@ class Settings {
             const data = fs.readFileSync(filePath, 'utf8');
             return data ? JSON.parse(data) : {};
         } catch (error) {
-            // Handle file-related errors or JSON parse errors
             console.error("Error loading settings:", error);
             return {};
         }
@@ -31,7 +29,6 @@ class Settings {
             fs.writeFileSync(filePath, JSON.stringify(this.settings, null, 2), 'utf8');
             console.log("Settings saved successfully.");
         } catch (error) {
-            // Handle file write error
             console.error("Error saving settings:", error);
         }
     }
@@ -55,6 +52,5 @@ class Settings {
         this.saveSettings();
     }
 }
-
 
 module.exports = Settings;
