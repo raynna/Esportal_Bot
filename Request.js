@@ -1,19 +1,5 @@
 const axios = require('axios');
 
-async function checkStreamStatus(channel) {
-    const requestFunction = async () => {
-        const response = await axios.get(`https://api.twitch.tv/helix/streams?user_login=${channel}`, {
-            headers: {
-                'Client-ID': process.env.TWITCH_CLIENT_ID,
-                'Authorization': `Bearer ${process.env.TWITCH_OAUTH_TOKEN}`
-            }
-        });
-        return {data: response.data, errorMessage: null};
-    }
-    const notFound = 'Channel not found on Twitch.';
-    return await handleRequest(requestFunction, notFound);
-}
-
 async function userData(value, requestType) {
     const requestFunction = async () => {
         const response = await axios.get(`https://api.esportal.com/user_profile/get?username=${encodeURIComponent(name)}&bans=1&current_match=1&team=1`);
