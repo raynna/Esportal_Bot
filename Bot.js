@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const tmi = require("tmi.js");
-const { updateChannels } = require('src/raynna/bot/channels/Channels');
+const { updateChannels } = require('./Channels');
 
 const client = new tmi.Client({
     connection: {

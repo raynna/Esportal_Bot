@@ -1,7 +1,7 @@
 {
   "name": "esportal_bot",
   "version": "1.0.0",
-  "main": "src/raynna/bot/Bot.js",
+  "main": "Bot.js",
   "scripts": {
     "start": "node src/raynna/bot/bot",
     "test": "echo \"Error: no test specified\" && exit 1"

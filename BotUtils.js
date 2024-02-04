@@ -1,7 +1,7 @@
 require('dotenv').config();
 axios = require('axios');
 
-const request = require('src/raynna/bot/requests/Request');
+const request = require('./Request');
 
 
 async function sendMessage(client, channel, message) {

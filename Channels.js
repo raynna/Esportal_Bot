@@ -1,8 +1,8 @@
 const fs = require('fs');
 
-const botUtils = require('src/raynna/bot/BotUtils');
+const botUtils = require('./BotUtils');
 
-const channelsFilePath = 'data/channels.txt';
+const channelsFilePath = './data/channels.txt';
 let connectedChannels = [];
 
 function getChannelsFromFile(filePath) {
