@@ -4,7 +4,7 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function isStreamOnline(channel) {
+async function checkStreamStatus(channel) {
     const requestFunction = async () => {
         const response = await axios.get(`https://api.twitch.tv/helix/streams?user_login=${channel}`, {
             headers: {
@@ -81,4 +81,4 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
     }
 }
 
-module.exports = { checkStreamStatus: isStreamOnline };
+module.exports = { checkStreamStatus };

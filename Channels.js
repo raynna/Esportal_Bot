@@ -2,8 +2,12 @@ const fs = require('fs');
 
 const botUtils = require('./BotUtils');
 
+const { sendMessage } = require('./BotUtils');
+
 const channelsFilePath = './data/channels.txt';
 let connectedChannels = [];
+
+
 
 function getChannelsFromFile(filePath) {
     try {
@@ -164,4 +168,4 @@ async function changeList(client, {
     }
 }
 
-module.exports = { updateChannels };
+module.exports = { updateChannels, connectedChannels };

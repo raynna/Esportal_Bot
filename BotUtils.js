@@ -6,7 +6,8 @@ const request = require('./Request');
 
 async function sendMessage(client, channel, message) {
     try {
-        client.say(channel, changeFont(message, channel));
+        console.log(`bot message: ${message}`);
+        client.say(channel, message);
     } catch (error) {
         console.error(error);
     }
@@ -32,4 +33,4 @@ function isCreatorChannel(channel) {
     return channel.toLowerCase().replace(/#/g, '') === process.env.CREATOR_CHANNEL;
 }
 
-module.exports = { isCreatorChannel, isStreamOnline}
+module.exports = { isCreatorChannel, isStreamOnline, sendMessage }

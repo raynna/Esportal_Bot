@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "Bot.js",
   "scripts": {
-    "start": "node src/raynna/bot/bot",
+    "start": "node bot",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Raynna",
