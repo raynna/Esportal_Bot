@@ -16,7 +16,6 @@ class Commands {
             const commandFiles = fs.readdirSync(path.join(__dirname, 'commands'));
 
             console.log('Found command files:', commandFiles);
-
             commandFiles.forEach(file => {
                 if (!file.startsWith('_')) {
                     try {

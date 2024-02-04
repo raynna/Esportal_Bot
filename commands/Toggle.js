@@ -1,4 +1,7 @@
 
+const { getUserData } = require('./Requests');
+const user = await getUserData(name);
+
 class Toggle {
     constructor() {
         this.moderator = true;

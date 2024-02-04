@@ -1,9 +1,5 @@
 const axios = require('axios');
 
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 async function checkStreamStatus(channel) {
     const requestFunction = async () => {
         const response = await axios.get(`https://api.twitch.tv/helix/streams?user_login=${channel}`, {
@@ -16,6 +12,76 @@ async function checkStreamStatus(channel) {
     }
     const notFound = 'Channel not found on Twitch.';
     return await handleRequest(requestFunction, notFound);
+}
+
+async function userData(value, requestType) {
+    const requestFunction = async () => {
+        const response = await axios.get(`https://api.esportal.com/user_profile/get?username=${encodeURIComponent(name)}&bans=1&current_match=1&team=1`);
+        return {data: response.data, errorMessage: null};
+    }
+    const notFound = `Player ${name} does not exist on Esportal.`;
+    return await handleRequest(requestFunction, notFound);
+}
+
+const RequestType = {
+    TWITCH_HEADER: {
+        headers: {
+            'Client-ID': process.env.TWITCH_CLIENT_ID,
+            'Authorization': `Bearer ${process.env.TWITCH_OAUTH_TOKEN}`
+        }
+    },
+    FACEIT_HEADER: {
+        headers: {
+            'Client-ID': process.env.TWITCH_CLIENT_ID,
+            'Authorization': `Bearer ${process.env.FACEIT_KEY}`
+        }
+    },
+    ESPORTAL_HEADER: {
+        headers: {
+            'Client-ID': process.env.TWITCH_CLIENT_ID,
+            'Authorization': `Bearer ${process.env.ESPORTAL_KEY}`
+        }
+    },
+    UserData: {
+        requiredHeader: this.esportalHeader.headers,
+        errors: {
+            notFound: 'This player does not exist on esportal.',
+            webisteDown: 'Esportal seems to be offline for the moment.'
+        },
+        link: 'https://api.esportal.com/user_profile/get?username={esportalName}&bans=1&current_match=1&team=1',
+        value: '{esportalName}'
+    },
+    GatherData: {
+        errors: {
+            notFound: 'This gather does not exist on Esportal'
+        },
+        link: 'https://api.esportal.com/gather/get?id={gatherId}',
+        value: '{gatherId}',
+    },
+    FaceItData: {
+        errors: {
+            notFound: 'This player does not exist on Faceit'
+        }
+    },
+    link: 'https://api.faceit.com/users/v1/nicknames/{username}',
+    value: '{username}',
+};
+
+//https://api.faceit.com/users/v1/nicknames/${encodeURIComponent(username)}
+//usage Requests.getData(name, RequestType.UserData);
+async function getData(value, requestType) {
+    const url = requestType.link.replace(requestType.value, value);
+    try {
+        const requestFunction = async () => {
+            const response = await axios.get(url, {
+                headers: requestType.requiredHeader
+            });
+            return {data: response.data, errorMessage: null};
+        }
+        return await handleRequest(requestFunction, requestType.notFound);
+    } catch (error) {
+        return {data: null, errorMessage: error.message};
+    }
 }
 
 async function handleRequest(requestFunction, additionalParams = {}, maxRetries = 3) {
@@ -81,4 +147,4 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
     }
 }
 
-module.exports = { checkStreamStatus };
+module.exports = {checkStreamStatus};

@@ -21,7 +21,7 @@ const client = new tmi.Client({
 });
 
 client.connect().then(() => {
-    console.log("Connected!");
+    console.log(`${process.env.TWITCH_BOT_USERNAME} is now connected!`);
 }).catch((error) => {
     console.error(error);
 });
@@ -29,7 +29,7 @@ client.connect().then(() => {
 const updateInterval = 30 * 1000; // 30 seconds
 setInterval(() => {
     updateChannels(client).then(r => {
-        console.log('Updated channels!');
+        //console.log('Updated channels!');
     });
 }, updateInterval);
 
@@ -38,7 +38,7 @@ client.on('connected', (address, port) =>  {
     try {
         setTimeout(() => {
             updateChannels(client).then(r => {
-                console.log(`Updated channels!`);
+                //console.log(`Updated channels!`);
             });
         }, 1000);
     } catch (error) {
