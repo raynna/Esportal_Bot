@@ -29,7 +29,7 @@ const RequestType = {
         }
     },
     UserData: {
-        requiredHeader: this.esportalHeader.headers,
+        requiredHeader: this.ESPORTAL_HEADER.headers,
         errors: {
             notFound: 'This player does not exist on esportal.',
             webisteDown: 'Esportal seems to be offline for the moment.'
