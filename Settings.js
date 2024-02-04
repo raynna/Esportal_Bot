@@ -5,6 +5,10 @@ class Settings {
         this.settings = this.loadSettings();
     }
 
+    static getInstance() {
+        return this;
+    }
+
     loadSettings() {
         const filePath = './data/settings.json';
 

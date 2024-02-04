@@ -1,9 +1,13 @@
 require('dotenv').config();
 
 const tmi = require("tmi.js");
-const { updateChannels, connectedChannels } = require('./Channels');
+
 const Commands = require('./Commands');
 const commands = new Commands();
+const Settings = require('./Settings');
+const settings = new Settings();
+
+const { updateChannels, connectedChannels } = require('./Channels');
 const { sendMessage } = require('./BotUtils');
 
 const client = new tmi.Client({

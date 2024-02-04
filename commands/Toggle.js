@@ -1,11 +1,9 @@
 
-const Settings = require('../Settings');
-
 class Toggle {
     constructor() {
         this.moderator = true;
         this.name = 'Toggle';
-        this.settings = new Settings();
+        this.settings = require('../Settings').getInstance();
         this.commands = require('../Commands').getInstance();
     }
 
@@ -17,13 +15,15 @@ class Toggle {
             if (!command) {
                 return `Please provide a command, usage; -> !toggle command, commands -> ${formattedList}`;
             }
-            if (command === 'enabled') {//TODO CHECK EMPTY
-                const enabled = validCommands.filter(command => !this.settings[channel].toggled.includes(command));
+            if (command === 'enabled') {
+                const enabled = this.settings[channel]?.toggled
+                    ? validCommands.filter(command => !this.settings[channel].toggled.includes(command))
+                    : validCommands;
                 const formattedList = this.commands.formatCommandList(enabled);
                 return `Enabled commands in ${channel} are: ${formattedList}`;
             }
             if (command === 'disabled') {
-                const disabled = this.settings[channel].toggled;//TODO CHECK EMPTY
+                const disabled = this.settings[channel]?.toggled || [];
                 const formattedList = this.commands.formatCommandList(disabled);
                 return `Disabled commands in ${channel} are: ${formattedList}`;
             }
