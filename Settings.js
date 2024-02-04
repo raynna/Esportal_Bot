@@ -10,7 +10,6 @@ class Settings {
 
         try {
             if (!fs.existsSync(filePath)) {
-                // If the file doesn't exist, create an empty one
                 fs.writeFileSync(filePath, '{}', 'utf8');
             }
 
@@ -35,8 +34,10 @@ class Settings {
 
 
     check(channel) {
-        if (this.settings[channel]) {
-            this.settings[channel] = {name: '', toggled: []};
+        this.settings = this.loadSettings();
+        if (!this.settings[channel]) {
+            this.settings[channel] = {name: "", toggled: []};
+            console.log(`settings for ${channel}: ${this.settings[channel]}`)
         }
     }
 
@@ -46,10 +47,19 @@ class Settings {
         this.saveSettings();
     }
 
-    testToggle(channel) {
+    toggle(channel, command, triggers) {
         this.check(channel);
-        this.settings[channel].toggled = ["test", "test2"];
+        const index = this.settings[channel].toggled.indexOf(command);
+        const disable = (index === -1);
+        const triggerList = `${triggers.length > 1 ? 's':''} [${triggers.map(trigger => `!${trigger}`).join(', ')}] has been ${disable ? `DISABLED` : `ENABLED`} for ${channel}.`;
+        if (disable) {
+            this.settings[channel].toggled.push(command);
+        } else {
+            this.settings[channel].toggled.splice(index, 1);
+        }
+        const result = `Command${triggerList}`;
         this.saveSettings();
+        return result;
     }
 }
 

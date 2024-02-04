@@ -7,6 +7,10 @@ class Commands {
         this.loadCommands();
     }
 
+    static getInstance() {
+        return this;
+    }
+
     loadCommands() {
         try {
             const commandFiles = fs.readdirSync(path.join(__dirname, 'commands'));
@@ -53,6 +57,55 @@ class Commands {
         } catch (error) {
             console.error('Error reading command files:', error);
         }
+    }
+
+    static getValidCommands() {
+        const commandsFolder = path.join(__dirname, '.', 'commands');
+        return fs.readdirSync(commandsFolder)
+            .filter(file => fs.statSync(path.join(commandsFolder, file)).isFile())
+            .map(file => path.parse(file).name)
+            .filter(command => command.toLowerCase() !== 'toggle');
+    }
+
+    commandExists(commandName) {
+        return this.commands.hasOwnProperty(commandName);
+    }
+
+    static formatCommandList(commands) {
+        return commands.length > 0 ? commands.join(', ') : 'None';
+    }
+
+    static findCommandClassByTrigger(trigger, validCommands) {
+        for (const command of validCommands) {
+            const CommandClass = require(path.join(__dirname, '.', 'commands', command));
+            const instance = new CommandClass();
+
+            if ((instance.triggers && instance.triggers.includes(trigger)) || command.toLowerCase() === trigger) {
+                return command.toLowerCase();
+            }
+        }
+        return null;
+    }
+
+    static getCommandTriggers(commandClass) {
+        const CommandClass = require(path.join(__dirname, '.', 'commands', commandClass));
+        const instance = new CommandClass();
+        return instance.triggers ? [commandClass, ...instance.triggers] : [commandClass];
+    }
+
+
+    isBlockedCommand(commandInstance, channel) {
+        /*const toggleConfig = this.loadToggleConfig();
+        const channelConfig = toggleConfig[channel] || [];
+        const commandName = commandInstance.name;
+        const blocked = commandName && (channelConfig.includes(commandName.toLowerCase()) || channelConfig.includes(`!${commandName.toLowerCase()}`));
+        return blocked;*/
+        return false;
+    }
+
+    isModeratorCommand(commandInstance) {
+        const isModeratorCommand = commandInstance?.moderator ?? false;
+        return isModeratorCommand;
     }
 }
 
