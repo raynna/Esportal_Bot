@@ -9,62 +9,74 @@ async function userData(value, requestType) {
     return await handleRequest(requestFunction, notFound);
 }
 
-const RequestType = {
+const Headers = {
     TWITCH_HEADER: {
-        headers: {
-            'Client-ID': process.env.TWITCH_CLIENT_ID,
-            'Authorization': `Bearer ${process.env.TWITCH_OAUTH_TOKEN}`
-        }
-    },
-    FACEIT_HEADER: {
-        headers: {
-            'Client-ID': process.env.TWITCH_CLIENT_ID,
-            'Authorization': `Bearer ${process.env.FACEIT_KEY}`
-        }
-    },
-    ESPORTAL_HEADER: {
-        headers: {
-            'Client-ID': process.env.TWITCH_CLIENT_ID,
-            'Authorization': `Bearer ${process.env.ESPORTAL_KEY}`
-        }
+        'Client-ID': process.env.TWITCH_CLIENT_ID,
+        'Authorization': `Bearer ${process.env.TWITCH_OAUTH_TOKEN}`
+    }
+}
+
+const RequestType = {
+    StreamStatus: {
+        name: 'Steam Status Data',
+        requiredHeader: Headers.TWITCH_HEADER,
+        errors: {
+            notFound: 'Twitch channel does not exist'
+        },
+        link: 'https://api.twitch.tv/helix/streams?user_id={id}',
+        values: ['{id}']
     },
     UserData: {
-        requiredHeader: this.esportalHeader.headers,
+        name: 'User Data',
         errors: {
-            notFound: 'This player does not exist on esportal.',
+            notFound: 'This player does not exist on Esportal.',
             webisteDown: 'Esportal seems to be offline for the moment.'
         },
-        link: 'https://api.esportal.com/user_profile/get?username={esportalName}&bans=1&current_match=1&team=1',
-        value: '{esportalName}'
+        link: 'https://api.esportal.com/user_profile/get?username={name}&bans=1&current_match=1&team=1',
+        values: ['{name}']
     },
     GatherData: {
+        name: 'Gather Data',
         errors: {
             notFound: 'This gather does not exist on Esportal'
         },
         link: 'https://api.esportal.com/gather/get?id={gatherId}',
-        value: '{gatherId}',
+        values: ['{gatherId}'],
     },
     FaceItData: {
+        name: 'Faceit Data',
         errors: {
             notFound: 'This player does not exist on Faceit'
-        }
+        },
+        link: 'https://api.faceit.com/users/v1/nicknames/{username}',
+        values: ['{username}'],
     },
-    link: 'https://api.faceit.com/users/v1/nicknames/{username}',
-    value: '{username}',
+    RecentMatchData: {
+        name: 'Match Data',
+        errors: {
+            notFound: 'This gather does not exist on Esportal'
+        },
+        link: 'https://api.esportal.com/gather/get?id={userId}&page={page}',
+        values: ['{userId}', '{page}'],
+    }
 };
 
-//https://api.faceit.com/users/v1/nicknames/${encodeURIComponent(username)}
 //usage Requests.getData(name, RequestType.UserData);
-async function getData(value, requestType) {
-    const url = requestType.link.replace(requestType.value, value);
+async function getData(requestType, ...args) {
+    let url = requestType.link;
+    for (const [index, value] of args.entries()) {
+        //console.log(`index: ${index}, arg[${index}]: ${args[index]}, value[${index}]: ${requestType.values[index]}`);
+        url = url.replace(requestType.values[index], value);
+    }
+    const headers = requestType.requiredHeader || {};
+    const config = {
+        headers: headers
+    }
     try {
-        const requestFunction = async () => {
-            const response = await axios.get(url, {
-                headers: requestType.requiredHeader
-            });
+        return await handleRequest(async () => {
+            const response = await axios.get(url, config);
             return {data: response.data, errorMessage: null};
-        }
-        return await handleRequest(requestFunction, requestType.notFound);
+        }, requestType.errors || {});
     } catch (error) {
         return {data: null, errorMessage: error.message};
     }
@@ -115,6 +127,10 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
                         case 504:
                             return {data: null, errorMessage: `Gateway Timeout: ${error.response.status}`};
                         case 522:
+                            if (additionalParams && additionalParams.webisteDown) {
+                                console.log(additionalParams.webisteDown);
+                                return {data: null, errorMessage: additionalParams.webisteDown};
+                            }
                             return {
                                 data: null,
                                 errorMessage: `Esportal website seems to be offline at the moment.`
@@ -133,4 +149,4 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
     }
 }
 
-module.exports = {checkStreamStatus};
+module.exports = {RequestType, getData};

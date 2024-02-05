@@ -36,18 +36,45 @@ class Settings {
         }
     }
 
-
-    check(channel) {
+    check(id) {
         this.settings = this.loadSettings();
-        if (!this.settings[channel]) {
-            this.settings[channel] = {name: "", toggled: []};
-            console.log(`settings for ${channel}: ${this.settings[channel]}`)
+        if (!this.settings[id]) {
+            this.settings[id] = { name: "" };
+            console.log(`Created new settings for ${id}: ${JSON.stringify(this.settings[id])}`);
+        }
+        if (this.settings[id]) {
+            if (!this.settings[id].esportal) {
+                this.settings[id].esportal = { name: "", id: -1};
+                console.log(`Added twitch settings for: ${id}`);
+            }
+            if (!this.settings[id].toggled) {
+                this.settings[id].toggled = { };
+                console.log(`Added toggle settings for: ${id}`);
+            }
+            console.log(`Settings for channel ${id}: ${JSON.stringify(this.settings[id])}`)
         }
     }
 
-     saveName(channel, name) {
+    getChannelId(channel) {
+        for (const s in this.settings) {
+            if (s.name.toLowerCase() === channel.toLowerCase()) {
+
+            }
+        }
+        if (!this.settings.map(c => c.name.toLowerCase().includes(channel.toLowerCase()))) {
+            return this.settings[c];
+        }
+    }
+
+    saveEsportalId(channel, id) {
         this.check(channel);
-        this.settings[channel].name = name;
+        this.settings[channel].esportal.id = id;
+        this.saveSettings();
+    }
+
+    saveName(channel, name) {
+        this.check(channel);
+        this.settings[channel].esportal.name = name;
         this.saveSettings();
     }
 
@@ -55,7 +82,7 @@ class Settings {
         this.check(channel);
         const index = this.settings[channel].toggled.indexOf(command);
         const disable = (index === -1);
-        const triggerList = `${triggers.length > 1 ? 's':''} [${triggers.map(trigger => `!${trigger}`).join(', ')}] has been ${disable ? `DISABLED` : `ENABLED`} for ${channel}.`;
+        const triggerList = `${triggers.length > 1 ? 's' : ''} [${triggers.map(trigger => `!${trigger}`).join(', ')}] has been ${disable ? `DISABLED` : `ENABLED`} for ${channel}.`;
         if (disable) {
             this.settings[channel].toggled.push(command);
         } else {

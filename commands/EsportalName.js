@@ -1,5 +1,6 @@
 
 const Settings = require('../Settings');
+const request = require('../Request');
 
 class EsportalName {
     constructor() {
@@ -15,7 +16,14 @@ class EsportalName {
             if (!name) {
                 return `Please provide a username, usage; -> !esportalname name`;
             }
-            this.settings.saveName(channel, name);
+            const { data: userData, errorMessage: error } = await request.getData(request.RequestType.UserData, name);
+            if (error) {
+                return error;
+            }
+            const username = userData.username;
+            const id = userData.id;
+            this.settings.saveName(channel, username);
+            this.settings.saveEsportalId(channel, id);
             return `Registered esportalname: ${name} for channel ${channel} @${tags.username}`;
         } catch (error) {
             console.error('Error on TestCommand:', error);

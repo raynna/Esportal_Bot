@@ -1,6 +1,4 @@
 
-const { getUserData } = require('./Requests');
-const user = await getUserData(name);
 
 class Toggle {
     constructor() {
@@ -36,7 +34,7 @@ class Toggle {
             const commandClass = this.commands.findCommandClassByTrigger(command, validCommands);
             if (commandClass) {
                 const triggers = this.commands.getCommandTriggers(commandClass);
-                return this.settings.toggle(channel, command, triggers);
+                return `todo`//this.settings.toggle(channel, command, triggers);
             }
             return `Couldn't find any command with trigger ${command}.`;
         } catch (error) {

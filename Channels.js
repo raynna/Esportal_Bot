@@ -1,7 +1,9 @@
 const fs = require('fs');
 
-const botUtils = require('./BotUtils');
+const Settings = require('./Settings');
+const settings = new Settings();
 
+const botUtils = require('./BotUtils');
 const { sendMessage } = require('./BotUtils');
 
 const channelsFilePath = './data/channels.txt';
@@ -18,10 +20,11 @@ function getChannelsFromFile(filePath) {
         return [];
     }
 }
-
+//"user_id":"30538510" twitch user_id for pani1337
 async function updateChannels(client) {
     try {
         const channelList = getChannelsFromFile(channelsFilePath);
+        const settingsList = settings.settings;
         const channelsToJoin = new Set();
         const channelsToLeave = new Set();
         let hasChanges = false;
@@ -29,6 +32,10 @@ async function updateChannels(client) {
         await Promise.all(connectedChannels.map(async (channel) => {
             try {
                 const normalizedChannelWithoutHash = channel.toLowerCase().replace(/#/g, '');
+                if (!settingsList.map(c => c.toLowerCase()).includes(channel)) {
+                    channelsToLeave.add(channel);
+                    hasChanges = true;
+                }
                 if (!channelList.map(c => c.toLowerCase()).includes(normalizedChannelWithoutHash) /*&& !isTestChannel(normalizedChannelWithoutHash)*/) {
                     channelsToLeave.add(channel);
                     hasChanges = true;
@@ -38,6 +45,15 @@ async function updateChannels(client) {
                 console.error(`Error checking stream status for ${channel}:`, error);
             }
         }));
+
+        await Promise.all(settingsList.map(async (channel) => {
+            try {
+                const channelId = channel.twitch.twitch_id;
+                const isStreamerOnlineNow = await botUtils.isStreamOnline(channelId);
+            } catch (error) {
+                console.error(`Error checking stream status for ${channel}:`, error);
+            }
+        }))
 
         await Promise.all(channelList.map(async (channel) => {
             const normalizedChannel = `#${channel.toLowerCase().trim()}`;

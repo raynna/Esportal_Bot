@@ -33,11 +33,12 @@ setInterval(() => {
     });
 }, updateInterval);
 
+const request = require('./Request');
 
 client.on('connected', (address, port) =>  {
     try {
         setTimeout(() => {
-            updateChannels(client).then(r => {
+            updateChannels(client).then(async r => {
                 //console.log(`Updated channels!`);
             });
         }, 1000);
