@@ -18,6 +18,24 @@ const RequestType = {
         link: 'https://api.twitch.tv/helix/streams?user_login={channel}',
         values: ['{channel}']
     },
+    TwitchUser: {
+        name: 'Twitch User Data',
+        requiredHeader: Headers.TWITCH_HEADER,
+        errors: {
+            notFound: 'Twitch channel does not exist'
+        },
+        link: 'https://api.twitch.tv/helix/users?login={channel}',
+        values: ['{channel}']
+    },
+    TwitchById: {
+        name: 'Twitch User By Id Data',
+        requiredHeader: Headers.TWITCH_HEADER,
+        errors: {
+            notFound: 'Twitch channel does not exist'
+        },
+        link: 'https://api.twitch.tv/helix/users?id={id}',
+        values: ['{id}']
+    },
     UserData: {
         name: 'User Data',
         errors: {
@@ -44,12 +62,20 @@ const RequestType = {
         values: ['{username}'],
     },
     RecentMatchData: {
-        name: 'Match Data',
+        name: 'Recent Match Data',
         errors: {
             notFound: 'This gather does not exist on Esportal'
         },
-        link: 'https://api.esportal.com/gather/get?id={userId}&page={page}',
-        values: ['{userId}', '{page}'],
+        link: 'https://esportal.com/api/user_profile/get_latest_matches?_=0&id={userId}&page={page}&v=2',
+        values: ['{userId}', '{page}']
+    },
+    RecentMatches: {
+        name: 'Recent Matches',
+        errors: {
+            notFound: 'This gather does not exist on Esportal'
+        },
+        link: 'https://esportal.com/api/user_profile/get_latest_matches?_=0&id={userId}&page=1&v=2',
+        values: ['{userId}']
     }
 };
 
@@ -64,12 +90,13 @@ const RequestType = {
 async function getData(requestType, ...args) {
     let url = requestType.link;
     for (const [index, value] of args.entries()) {
-        url = url.replace(requestType.values[index], value);
+        url = url.replace(requestType.values[index], typeof value === 'string' ? value.toLowerCase() : value);
     }
     const headers = requestType.requiredHeader || {};
     const config = {
         headers: headers
     }
+    //console.log(`url: ${url}, values: ${args}`);
     try {
         return await handleRequest(async () => {
             const response = await axios.get(url, config);

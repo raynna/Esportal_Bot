@@ -1,0 +1,365 @@
+{
+  "25415809": {
+    "twitch": {
+      "channel": "tiimwork",
+      "username": "Tiimwork"
+    },
+    "esportal": {
+      "id": 145746758,
+      "name": "Tiimwork"
+    },
+    "toggled": []
+  },
+  "30538510": {
+    "twitch": {
+      "channel": "pani1337",
+      "username": "pani1337"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "31378270": {
+    "twitch": {
+      "channel": "war1at",
+      "username": "War1aT"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "38009707": {
+    "twitch": {
+      "channel": "fribergcs",
+      "username": "fribergCS"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "38019896": {
+    "twitch": {
+      "channel": "heatoncs",
+      "username": "HeatoNcs"
+    },
+    "esportal": {
+      "id": 889046928,
+      "name": "HeatoN"
+    },
+    "toggled": []
+  },
+  "47536262": {
+    "twitch": {
+      "channel": "joakimxjansson",
+      "username": "joakimxjansson"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "47847839": {
+    "twitch": {
+      "channel": "netwrm",
+      "username": "netwrm"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "55038335": {
+    "twitch": {
+      "channel": "esportal",
+      "username": "Esportal"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "62489635": {
+    "twitch": {
+      "channel": "daman_gg",
+      "username": "DaMan_gg"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "63232377": {
+    "twitch": {
+      "channel": "libbzer",
+      "username": "Libbzer"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "65381354": {
+    "twitch": {
+      "channel": "punishdd",
+      "username": "Punishdd"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "76070637": {
+    "twitch": {
+      "channel": "hyperionflip",
+      "username": "Hyperionflip"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "78501398": {
+    "twitch": {
+      "channel": "duckonatruck",
+      "username": "DuckOnATruck"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "100218841": {
+    "twitch": {
+      "channel": "flinga88",
+      "username": "Flinga88"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "113257375": {
+    "twitch": {
+      "channel": "zoontw",
+      "username": "Zoontw"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "126164678": {
+    "twitch": {
+      "channel": "emzgamez",
+      "username": "EmzGamez"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "141445019": {
+    "twitch": {
+      "channel": "honkoh",
+      "username": "honkoh"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "142494422": {
+    "twitch": {
+      "channel": "drudiuzesportal",
+      "username": "DrudiuzEsportal"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "143476907": {
+    "twitch": {
+      "channel": "paraalyyze",
+      "username": "paraalyyze"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "145498937": {
+    "twitch": {
+      "channel": "stakarn",
+      "username": "StakarN"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "150145098": {
+    "twitch": {
+      "channel": "stekefar",
+      "username": "StekeFar"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "151262560": {
+    "twitch": {
+      "channel": "lossalito",
+      "username": "Lossalito"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "156546552": {
+    "twitch": {
+      "channel": "errkkan",
+      "username": "Errkkan"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "158066083": {
+    "twitch": {
+      "channel": "barajohanna",
+      "username": "Barajohanna"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "189243698": {
+    "twitch": {
+      "channel": "luukascs",
+      "username": "luukascs"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "236546036": {
+    "twitch": {
+      "channel": "kdmj_",
+      "username": "KDmJ_"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "434303919": {
+    "twitch": {
+      "channel": "chrilleekberg",
+      "username": "chrilleekberg"
+    },
+    "esportal": {
+      "id": 927602257,
+      "name": "ChrilleEkberG"
+    },
+    "toggled": []
+  },
+  "467664914": {
+    "twitch": {
+      "channel": "lasseman86",
+      "username": "lasseman86"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "491679637": {
+    "twitch": {
+      "channel": "raynnacs",
+      "username": "RaynnaCS"
+    },
+    "esportal": {
+      "id": 64482212,
+      "name": "Raynna"
+    },
+    "toggled": []
+  },
+  "505227161": {
+    "twitch": {
+      "channel": "4ndreass",
+      "username": "4ndreass"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "530692803": {
+    "twitch": {
+      "channel": "majzs",
+      "username": "Majzs"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  },
+  "561066744": {
+    "twitch": {
+      "channel": "ltsmaluwa",
+      "username": "ltsmaluwa"
+    },
+    "esportal": {
+      "id": 450444271,
+      "name": "Maluwa"
+    },
+    "toggled": []
+  },
+  "770380917": {
+    "twitch": {
+      "channel": "mribovic",
+      "username": "mribovic"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": []
+  }
+}

@@ -13,7 +13,7 @@ class Commands {
 
     loadCommands() {
         try {
-            const commandFiles = fs.readdirSync(path.join(__dirname, 'commands'));
+            const commandFiles = fs.readdirSync(path.join('src/raynna/bot/command/commands/'));
 
             console.log('Found command files:', commandFiles);
             commandFiles.forEach(file => {
@@ -59,12 +59,25 @@ class Commands {
     }
 
     static getValidCommands() {
-        const commandsFolder = path.join(__dirname, '.', 'commands');
-        return fs.readdirSync(commandsFolder)
+        const commandsFolder = path.join('src/raynna/bot/command/commands/');
+        const commands = fs.readdirSync(commandsFolder)
             .filter(file => fs.statSync(path.join(commandsFolder, file)).isFile())
-            .map(file => path.parse(file).name)
-            .filter(command => command.moderator) === true;
+            .map(file => {
+                const commandName = path.parse(file).name;
+                const CommandClass = require(path.join(__dirname, '.', 'commands', file));
+
+                return { name: commandName, class: CommandClass };
+            });
+
+        // Filter out commands that are marked as moderator commands
+        const nonModeratorCommands = commands.filter(command => {
+            const instance = new command.class();
+            return !instance.moderator;
+        });
+
+        return nonModeratorCommands.map(command => command.name);
     }
+
 
     commandExists(commandName) {
         return this.commands.hasOwnProperty(commandName);

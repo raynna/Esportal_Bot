@@ -1,5 +1,5 @@
 
-const Settings = require('../../Settings');
+const Settings = require('../../settings/Settings');
 const {getData, RequestType} = require('../../requests/Request');
 
 class EsportalName {
@@ -20,24 +20,30 @@ class EsportalName {
             if (error) {
                 return error;
             }
-            const username = userData.username;
-            const id = userData.id;
-            if (this.settings.settings.hasOwnProperty(channel)) {
-                if (this.settings.settings[channel].esportal.name.toLowerCase() === username.toLowerCase()) {
-                    return `Esportal Name: ${username} is already registered on this channel.`;
+            const { id: esportalId, username: esportalName } = userData;
+
+            const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
+            const { data: twitch, errorMessage: twitchError } = await getData(RequestType.TwitchUser, channelWithoutHash);
+            if (twitchError) {
+                return twitchError;
+            }
+            const { id: twitchId } = twitch.data[0];
+            await this.settings.check(twitchId);
+            if (this.settings.savedSettings.hasOwnProperty(twitchId)) {
+                if (this.settings.savedSettings[twitchId].esportal.name.toLowerCase() === esportalName.toLowerCase()) {
+                    return `Esportal Name: ${esportalName} is already registered on this channel.`;
                 }
             }
-            for (const registeredChannel in this.settings.settings) {
-                if (this.settings.settings.hasOwnProperty(registeredChannel)) {
-                    const registeredSettings = this.settings.settings[registeredChannel];
-                    if (registeredSettings.esportal && registeredSettings.esportal.name.toLowerCase() === username.toLowerCase()) {
-                        return `Esportal Name: ${username} is already registered for channel ${registeredChannel}.`;
+            for (const registeredChannel in this.settings.savedSettings) {
+                if (this.settings.savedSettings.hasOwnProperty(registeredChannel)) {
+                    const registeredSettings = this.settings.savedSettings[registeredChannel];
+                    if (registeredSettings.esportal && registeredSettings.esportal.name.toLowerCase() === esportalName.toLowerCase()) {
+                        return `Esportal Name: ${esportalName} is already registered for channel ${this.settings.savedSettings[registeredChannel].twitch.channel}.`;
                     }
                 }
             }
-            this.settings.saveName(channel, username);
-            this.settings.saveEsportalId(channel, id);
-            return `Registered Esportal Name: ${username} for channel ${channel}`;
+            await this.settings.saveEsportal(twitchId, esportalName, esportalId);
+            return `Registered/updated Esportal Name: ${esportalName} for channel ${channel}`;
         } catch (error) {
             console.error('Error on EsportalName Command:', error);
             return 'An error occurred while registering Esportal Name.';

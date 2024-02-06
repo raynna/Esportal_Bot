@@ -2,6 +2,8 @@ const { addChannel } = require('../../utils/BotUtils');
 
 const {getData, RequestType} = require('../../requests/Request');
 
+const { updateChannels } = require('../../channels/Channels');
+
 class ChangeList {
     constructor() {
         this.moderator = true;
@@ -12,9 +14,9 @@ class ChangeList {
         try {
             let name = argument ? argument.trim() : "";
             if (!name) {
-                return `Please provide a channel, usage; -> !changelist channel`;
+                return await addChannel(tags.username);
             }
-            const requestType = RequestType.StreamStatus;
+            const requestType = RequestType.TwitchUser;
             const { data: twitchData, errorMessage: message } = await getData(requestType, name);
             if (message) {
                 if (requestType.errors.notFound) {
@@ -22,12 +24,12 @@ class ChangeList {
                 }
                 return message;
             }
-            //todo check if alrdy added
-            await addChannel(client, name);
-            return `Add bot to channel: ${channel}, name: ${name}`;
+            let result = await addChannel(name);
+            await updateChannels(client);
+            return result;
         } catch (error) {
-            console.error('Error on TestCommand:', error);
-            return 'Nu blev lite fel va? Error: ChangeList.';
+            console.error('Error on ChangeList:', error);
+            return 'Error: ChangeList.';
         }
     }
 }

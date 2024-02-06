@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const Settings = require('../Settings');
+const Settings = require('../settings/Settings');
 const settings = new Settings();
 
 const botUtils = require('../utils/BotUtils');
@@ -23,15 +23,18 @@ function getChannelsFromFile(filePath) {
 //"user_id":"30538510" twitch user_id for pani1337
 async function updateChannels(client) {
     try {
-        await settings.loadSettings();
-        const settingsList = Object.keys(settings.settings);
+        settings.savedSettings = await settings.loadSettings();
+        const settingsList = Object.entries(settings.savedSettings);
         const channelsToJoin = new Set();
         const channelsToLeave = new Set();
         let hasChanges = false;
 
         await Promise.all(connectedChannels.map(async (channel) => {
             try {
-                if (!settingsList.map(c => c.toLowerCase()).includes(channel.toLowerCase())) {
+                const channelExists = Object.values(settings.savedSettings).some(entry => entry.twitch.channel === channel);
+
+                if (!channelExists) {
+                    // If the channel does not exist in savedSettings, remove it
                     channelsToLeave.add(channel);
                     hasChanges = true;
                 }
@@ -40,18 +43,21 @@ async function updateChannels(client) {
             }
         }));
 
-        await Promise.all(settingsList.map(async (channel) => {
+        await Promise.all(Object.keys(settings.savedSettings).map(async (twitchId) => {
+            const userSettings = settings.savedSettings[twitchId];
+            const twitchChannel = userSettings.twitch.channel;
+
             try {
-                const isStreamerOnlineNow = await botUtils.isStreamOnline(channel);
-                if ((botUtils.isCreatorChannel(channel) || isStreamerOnlineNow) && !connectedChannels.includes(channel)) {
-                    channelsToJoin.add(channel);
+                const isStreamerOnlineNow = await botUtils.isStreamOnline(twitchChannel);
+                if ((botUtils.isCreatorChannel(twitchChannel) || isStreamerOnlineNow) && !connectedChannels.includes(twitchChannel)) {
+                    channelsToJoin.add(twitchChannel);
                     hasChanges = true;
-                } else if (!isStreamerOnlineNow && !botUtils.isCreatorChannel(channel) && connectedChannels.includes(channel)) {
-                    channelsToLeave.add(channel);
+                } else if (!isStreamerOnlineNow && !botUtils.isCreatorChannel(twitchChannel) && connectedChannels.includes(twitchChannel)) {
+                    channelsToLeave.add(twitchChannel);
                     hasChanges = true;
                 }
             } catch (error) {
-                console.error(`Error checking stream status for ${channel}:`, error);
+                console.error(`Error checking stream status for ${twitchChannel}:`, error);
             }
         }));
 

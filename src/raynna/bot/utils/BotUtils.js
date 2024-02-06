@@ -1,21 +1,31 @@
 require('dotenv').config();
 axios = require('axios');
 
-const Settings = require('../Settings');
+const Settings = require('../settings/Settings');
 const settings = new Settings();
 
+const {getData, RequestType} = require('../requests/Request');
 const request = require('../requests/Request');
 
-async function addChannel(client, channel) {
-    settings.loadSettings();
-    const allSettings = Object.keys(settings.settings);
-    for (const twitch of allSettings) {
-        if (twitch.includes(channel)) {
-            console.log(`Already registered channel: ${channel}, id: ${twitch} on bot.`);
-            return;
-        }
+async function addChannel(channel) {
+    const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
+    const {data: twitch, errorMessage: error} = await getData(RequestType.TwitchUser, channelWithoutHash);
+    if (error) {
+        console.log(error);
+        return error;
     }
-    console.log(`Not registered on on. add: ${channel}`);
+    if (!twitch.data || twitch.data.length === 0) {
+        return `Something went from getting this twitch, no data`;
+    }
+    const {id: id, login: login, display_name: username} = twitch.data[0];
+    settings.savedSettings = await settings.loadSettings();
+    if (settings.savedSettings[id] && settings.savedSettings[id].twitch.channel) {
+        console.log(`Twitch channel ${settings.savedSettings[id].twitch.channel} is already registered on the bot.`);
+        return `Twitch channel ${settings.savedSettings[id].twitch.channel} is already registered on the bot.`;
+    }
+    await settings.save(id, login, username);
+    console.log(`Bot registered on channel: ${login} (id: ${id}).`);
+    return `Bot registered on channel: ${login} (id: ${id}).`;
 }
 
 async function sendMessage(client, channel, message) {
@@ -35,17 +45,20 @@ async function sendMessage(client, channel, message) {
  * cdn.jtvnw.net/previews-ttv/live_user_daman_gg-{width}x{height}.jpg","tag_ids":[],"tags":["swe","Svenska","DaddyGamer","everyone","eng","English","counterstrike","esportal"],"is_mature":false}], length: 1
  */
 
+//checks if there is any data to gather, if not, stream is offline and returns false
 async function isStreamOnline(channel) {
-    const channelWithoutHash = channel.startsWith('#') ? channel.slice(1) : channel;
-    const {data: streamData, errorMessage: message} = await request.getData(request.RequestType.StreamStatus, channelWithoutHash);
+    const {data: streamData, errorMessage: message} = await request.getData(request.RequestType.StreamStatus, channel);
     if (message) {
-        console.log(`[BotUtils.isStreamOnline], channel: ${channel} - `, `${message}`);
+        //console.log(`[BotUtils.isStreamOnline], channel: ${channel} - `, `${message}`);
         return false;
     }
+    //user_id is the name appearntly for streamstatus, but id for twitchuser data
     if (streamData.data && streamData.data.length > 0) {
-        settings.check(channel);
+        const {user_id: twitchId, login: login} = streamData.data[0];
+        await settings.check(twitchId);
     }
-    //console.log(`data for channel ${channel}: ${JSON.stringify(streamData.data)}, length: ${streamData.data.length}`);
+
+    //console.log(`data for channel: ${channel}: ${JSON.stringify(streamData)}, length: ${streamData.length}`);
     return streamData.data && streamData.data.length > 0;
 }
 

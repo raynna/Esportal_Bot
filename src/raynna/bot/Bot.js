@@ -4,11 +4,11 @@ const tmi = require("tmi.js");
 
 const Commands = require('./command/Commands');
 const commands = new Commands();
-const Settings = require('./Settings');
+const Settings = require('./settings/Settings');
 const settings = new Settings();
 
 const { updateChannels, connectedChannels } = require('./channels/Channels');
-const { sendMessage } = require('./utils/BotUtils');
+const { sendMessage, addChannel } = require('./utils/BotUtils');
 
 const client = new tmi.Client({
     connection: {
@@ -39,6 +39,13 @@ client.on('connected', (address, port) =>  {
     try {
         setTimeout(() => {
             updateChannels(client).then(async r => {
+                await addChannel("raynnacs");
+                /*if (!settings.saveSettings.hasOwnProperty("#raynnacs")) {
+                    const requestType = RequestType.TwitchUser;
+                    const { data: twitchData, errorMessage: twitchError } = await getData(requestType, "raynnacs");
+                    const { id: id, login: channel, display_name: username } = twitchData;
+                    settings.save(id, channel, username);
+                }*/
                 //console.log(`Updated channels!`);
             });
         }, 1000);
@@ -49,7 +56,7 @@ client.on('connected', (address, port) =>  {
 
 client.on('join', (channel, username, self) => {
     try {
-        const normalizedChannel = channel.toLowerCase().trim();
+        const normalizedChannel = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel;
 
         if (self && !connectedChannels.includes(normalizedChannel)) {
             connectedChannels.push(normalizedChannel);
@@ -103,6 +110,7 @@ client.on('message', async (channel, tags, message, self) => {
 });
 
 const readline = require('readline');
+const {RequestType, getData} = require("./requests/Request");
 
 process.on('SIGINT', async () => {
     let closingReason = false;
