@@ -67,11 +67,44 @@ client.on('join', (channel, username, self) => {
 });
 
 const regexpCommand = new RegExp(/^!([a-zA-Z0-9]+)(?:\s+)?([\s\S]*)?/);
+const messageCounts = {};
+const messageTimestamps = {};
+const cooldowns = {};
 
 client.on('message', async (channel, tags, message, self) => {
     try {
         const isNotBot = tags && tags.username && tags.username.toLowerCase() !== process.env.TWITCH_BOT_USERNAME;
         if (isNotBot) {
+            if (!messageCounts[tags.username]) {
+                messageCounts[tags.username] = 0;
+            }
+
+            if (!messageTimestamps[tags.username]) {
+                messageTimestamps[tags.username] = Date.now();
+            }
+
+            if (!cooldowns[tags.username]) {
+                cooldowns[tags.username] = {};
+            }
+
+            if (!cooldowns[tags.username][channel]) {
+                cooldowns[tags.username][channel] = 0;
+            }
+
+            const currentTime = Date.now();
+            const timeDifference = currentTime - messageTimestamps[tags.username];
+
+            if (timeDifference < 30000 && messageCounts[tags.username] >= 20) {
+                console.log(`Rate limit exceeded for user ${tags.username}`);
+                return;
+            }
+
+            if (timeDifference >= 30000) {
+                messageTimestamps[tags.username] = currentTime;
+                messageCounts[tags.username] = 1;
+            } else {
+                messageCounts[tags.username]++;
+            }
             const match = message.match(regexpCommand);
             if (match) {
                 const [, command, argument] = match;
@@ -80,6 +113,16 @@ client.on('message', async (channel, tags, message, self) => {
                 const commandInstance = commands.commands[commandTrigger];
                 if (commandInstance && typeof commandInstance.execute === 'function') {
                     try {
+                        if (await commands.isBlockedCommand(commandInstance, channel)) {
+                            console.log(`Command ${command} is blocked in channel ${channel}`);
+                            return;
+                        }
+                        const commandCooldown = cooldowns[tags.username][channel];
+                        if (commandCooldown && currentTime - commandCooldown < 5000) {
+                            console.log(`Command cooldown active for user ${tags.username}`);
+                            return;
+                        }
+                        cooldowns[tags.username][channel] = currentTime;
                         const playerIsMod = tags.mod
                         const isModerator = await client.isMod(channel, process.env.TWITCH_BOT_USERNAME);
                         const isStreamer = channel.slice(1).toLowerCase() === tags.username.toLowerCase();

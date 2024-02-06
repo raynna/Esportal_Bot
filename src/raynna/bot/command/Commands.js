@@ -1,10 +1,13 @@
 const fs = require('fs');
 const path = require('path');
+const {getData, RequestType} = require("../requests/Request");
+const Settings = require("../settings/Settings");
 
 class Commands {
     constructor() {
         this.commands = {};
         this.loadCommands();
+        this.settings = new Settings();
     }
 
     static getInstance() {
@@ -106,13 +109,20 @@ class Commands {
     }
 
 
-    isBlockedCommand(commandInstance, channel) {
-        /*const toggleConfig = this.loadToggleConfig();
-        const channelConfig = toggleConfig[channel] || [];
+    async isBlockedCommand(commandInstance, channel) {
+        const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
+        const {data: twitch, errorMessage: error} = await getData(RequestType.TwitchUser, channelWithoutHash);
+        if (error) {
+            console.log(error);
+            return error;
+        }
+        if (!twitch.data || twitch.data.length === 0) {
+            return `Something went from getting this twitch, no data`;
+        }
+        const {id: id, login: login, display_name: username} = twitch.data[0];
+        await this.settings.check(id);
         const commandName = commandInstance.name;
-        const blocked = commandName && (channelConfig.includes(commandName.toLowerCase()) || channelConfig.includes(`!${commandName.toLowerCase()}`));
-        return blocked;*/
-        return false;
+        return commandName && (this.settings.savedSettings[id].toggled.includes(commandName.toLowerCase()) || this.settings.savedSettings[id].toggled.includes(`!${commandName.toLowerCase()}`));
     }
 
     isModeratorCommand(commandInstance) {

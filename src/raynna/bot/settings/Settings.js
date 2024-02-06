@@ -78,6 +78,11 @@ class Settings {
                 console.log(`Added toggle settings for: ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId].toggled)}`);
                 hasChanges = true;
             }
+            if (!this.savedSettings[twitchId].font) {
+                this.savedSettings[twitchId].font = "bold";
+                console.log(`Added font settings for: ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId].font)}`);
+                hasChanges = true;
+            }
             if (this.savedSettings[twitchId].toggled && !Array.isArray(this.savedSettings[twitchId].toggled)) {
                 this.savedSettings[twitchId].toggled = [];
                 console.log(`Tranformed toggle settings for: ${twitchId} to array: ${JSON.stringify(this.savedSettings[twitchId].toggled)}`);

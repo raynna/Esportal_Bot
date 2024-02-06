@@ -7,6 +7,8 @@ const settings = new Settings();
 const {getData, RequestType} = require('../requests/Request');
 const request = require('../requests/Request');
 
+const { getFontStyle } = require('./Fonts');
+
 async function addChannel(channel) {
     const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
     const {data: twitch, errorMessage: error} = await getData(RequestType.TwitchUser, channelWithoutHash);
@@ -28,10 +30,29 @@ async function addChannel(channel) {
     return `Bot registered on channel: ${login} (id: ${id}).`;
 }
 
+async function changeFont(text, channel) {
+    const styleMap = await getFontStyle(channel, settings);
+    let isLink = false;
+    let isTag = false;
+    return text.split('').map((char, index) => {
+        if (text.length - 1 === index && (char === ' ' || char === '\n')) {
+            return '';
+        } else if ((char === ' ' || char === '\t' || char === '\n') && (isLink || isTag)) {
+            isLink = false;
+            isTag = false;
+        } else if (text.substring(index).startsWith('https://') && !isLink) {
+            isLink = true;
+        } else if (char === '@' && !isLink) {
+            isTag = true;
+        }
+        return (isLink || isTag) ? char : (styleMap[char] || char);
+    }).join('');
+}
+
 async function sendMessage(client, channel, message) {
     try {
         console.log(`bot message: ${message}`);
-        client.say(channel, message);
+        client.say(channel, await changeFont(message, channel));
     } catch (error) {
         console.error(error);
     }
