@@ -76,9 +76,16 @@ const RequestType = {
         },
         link: 'https://esportal.com/api/user_profile/get_latest_matches?_=0&id={userId}&page=1&v=2',
         values: ['{userId}']
+    },
+    MapData: {
+        name: 'Map Data',
+        link: 'https://esportal.com/api/maps'
+    },
+    GatherList: {
+        name: 'Gather List',
+        link: 'https://esportal.com/api/gather/list?_=0&region_id=0&subregion_id=0'
     }
 };
-
 /**
  * Usage examples:
  * [Request.getData(RequestType.UserData, name);]
@@ -151,6 +158,7 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
                     case 408:
                         return {data: null, errorMessage: `Request Timeout: ${error.response.status}`};
                     case 429:
+                        await delay(1000);
                         return {
                             data: null,
                             errorMessage: `Requested information to frequently, try again later.`

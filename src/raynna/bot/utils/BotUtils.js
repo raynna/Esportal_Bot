@@ -30,6 +30,15 @@ async function addChannel(channel) {
     return `Bot registered on channel: ${login} (id: ${id}).`;
 }
 
+async function isBotModerator(client, channel) {
+    try {
+        return client.isMod(channel, process.env.TWITCH_BOT_USERNAME);
+    } catch (error) {
+        console.error('Error:', error);
+        return false;
+    }
+}
+
 async function changeFont(text, channel) {
     const styleMap = await getFontStyle(channel, settings);
     let isLink = false;
@@ -87,4 +96,4 @@ function isCreatorChannel(channel) {
     return channel.toLowerCase().replace(/#/g, '') === process.env.CREATOR_CHANNEL;
 }
 
-module.exports = {isCreatorChannel, isStreamOnline, sendMessage, addChannel}
+module.exports = {isCreatorChannel, isStreamOnline, sendMessage, addChannel, isBotModerator}

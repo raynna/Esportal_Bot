@@ -7,8 +7,11 @@ const commands = new Commands();
 const Settings = require('./settings/Settings');
 const settings = new Settings();
 
+const { isBotModerator } = require('./utils/BotUtils');
+
 const { updateChannels, connectedChannels } = require('./channels/Channels');
 const { sendMessage, addChannel } = require('./utils/BotUtils');
+const { getMapName } = require('./utils/MapUtils');
 
 const client = new tmi.Client({
     connection: {
@@ -32,6 +35,93 @@ setInterval(() => {
         //console.log('Updated channels!');
     });
 }, updateInterval);
+
+async function showGatherLobby(userData, gatherId, channel, client) {
+    const { data: gatherList, errorMessage: errorMessage } = await getData(RequestType.GatherList);
+    if (errorMessage) {
+        return;
+    }
+    const gather = gatherList.find(gather => gather.id === gatherId);
+    if (!gather) {
+        return;
+    }
+    const { data: gatherData, errorMessage: gatherError } = await getData(RequestType.GatherData, gatherId);
+    if (gatherError) {
+        return;
+    }
+    const { players } = gatherData;
+    const { picked_players, map_id } = gather;
+    const waiting = players.length - picked_players;
+    const mapName = await getMapName(map_id);
+
+    const isModerator = await isBotModerator(client, channel);
+    if (isModerator) {
+        return `${userData.username} started a gather: https://www.esportal.com/sv/gather/${gatherId} ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
+    }
+    return `${userData.username} started a gather lobby, ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
+}
+
+let previousLobbies = null;
+
+const updateGathers = 3 * 1000;
+setInterval(async () => {
+    try {
+        const esportalResponse = await getData(RequestType.GatherList);
+        if (esportalResponse.errorMessage) {
+            console.log(esportalResponse.errorMessage);
+            return;
+        }
+        const currentLobbies = esportalResponse.data;
+        //console.log("current lobbies: " + currentLobbies.map(changed => `Lobby Name: ${changed.name}, Creator: ${changed.creator.username}`).join(', '));
+
+        if (previousLobbies !== null) {
+            const changedLobbies = findChangedLobbies(previousLobbies, currentLobbies);
+            //console.log("changed lobbies: " + changedLobbies.map(changed => `Lobby Name: ${changed.name}, Creator: ${changed.creator.username}`).join(', '));
+
+            for (const lobby of changedLobbies) {
+                //console.log("changed lobby: " + lobby.name + ", creator: " + lobby.creator.username + "");
+                const esportalName = lobby.creator.username;
+                settings.savedSettings = await settings.loadSettings();
+                const channelEntry  = Object.values(settings.savedSettings).find(entry => entry.esportal.name === esportalName);
+                let channel = null;
+                if (channelEntry) {
+                    channel = channelEntry.twitch.channel;
+                }
+                if (!channel) {
+                    console.log(`New gather created found by ${esportalName}, but they are not registered on the bot.`);
+                }
+                if (channel) {
+                    //console.log("channel: " + channel);
+                    let message = ``;
+                    //console.log(message);
+                    const { data: userData, errorMessage: userError } = await getData(RequestType.UserData, esportalName);
+                    if (userError) {
+                        return;
+                    }
+                    const isModerator = await isBotModerator(client, channel);
+                    if (!isModerator) {
+                        return;
+                    }
+                    const { current_gather_id } = userData;
+                    if (!current_gather_id) {
+                        return;
+                    }
+                    message = await showGatherLobby(userData, current_gather_id, channel, client);
+                    console.log(`[Gather created] ${message}`);
+                    await sendMessage(client, channel, message);
+                }
+            }
+        }
+        previousLobbies = currentLobbies;
+        //console.log("set previous lobbies to: " + previousLobbies.map(changed => `Lobby Name: ${changed.name}, Creator: ${changed.creator.username}`).join(', '));
+    } catch (error) {
+        console.error('Error fetching Esportal data:', error);
+    }
+}, updateGathers);
+
+function findChangedLobbies(previous, current) {
+    return current.filter((lobby) => !previous.some((prevLobby) => prevLobby.id === lobby.id));
+}
 
 const request = require('./requests/Request');
 
@@ -174,7 +264,7 @@ process.on('SIGINT', async () => {
 
         console.log(`Bot going offline, Reason: ${closingReason.trim() !== '' ? closingReason : 'No Reason'}.`);
         for (const channel of connectedChannels) {
-            const isModerator = await isModerator(client, channel);
+            const isModerator = await isBotModerator(client, channel);
             if (isModerator && closingReason.trim() !== '') {
                 await sendMessage(client, channel, closingReason);
             }

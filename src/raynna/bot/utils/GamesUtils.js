@@ -15,10 +15,9 @@ async function getGamesData(userId, duration = "daily") {
 
 
         const filteredMatches = allMatches.filter(filterFunction);
-
-        filteredMatches.forEach(match => {
+        /*filteredMatches.forEach(match => {
             console.log(`Match played: ${new Date(match.inserted * 1000)}, elo: ${match.elo_change}`);
-        });
+        });*/
 
         return filteredMatches.map(match => ({
             elo_change: match.elo_change,
