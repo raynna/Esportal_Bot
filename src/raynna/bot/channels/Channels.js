@@ -1,14 +1,13 @@
 const fs = require('fs');
 
-const Settings = require('./Settings');
+const Settings = require('../Settings');
 const settings = new Settings();
 
-const botUtils = require('./BotUtils');
-const { sendMessage } = require('./BotUtils');
+const botUtils = require('../utils/BotUtils');
+const {sendMessage} = require('../utils/BotUtils');
 
 const channelsFilePath = './data/channels.txt';
 let connectedChannels = [];
-
 
 
 function getChannelsFromFile(filePath) {
@@ -20,26 +19,21 @@ function getChannelsFromFile(filePath) {
         return [];
     }
 }
+
 //"user_id":"30538510" twitch user_id for pani1337
 async function updateChannels(client) {
     try {
-        const channelList = getChannelsFromFile(channelsFilePath);
-        const settingsList = settings.settings;
+        await settings.loadSettings();
+        const settingsList = Object.keys(settings.settings);
         const channelsToJoin = new Set();
         const channelsToLeave = new Set();
         let hasChanges = false;
 
         await Promise.all(connectedChannels.map(async (channel) => {
             try {
-                const normalizedChannelWithoutHash = channel.toLowerCase().replace(/#/g, '');
-                if (!settingsList.map(c => c.toLowerCase()).includes(channel)) {
+                if (!settingsList.map(c => c.toLowerCase()).includes(channel.toLowerCase())) {
                     channelsToLeave.add(channel);
                     hasChanges = true;
-                }
-                if (!channelList.map(c => c.toLowerCase()).includes(normalizedChannelWithoutHash) /*&& !isTestChannel(normalizedChannelWithoutHash)*/) {
-                    channelsToLeave.add(channel);
-                    hasChanges = true;
-
                 }
             } catch (error) {
                 console.error(`Error checking stream status for ${channel}:`, error);
@@ -48,27 +42,16 @@ async function updateChannels(client) {
 
         await Promise.all(settingsList.map(async (channel) => {
             try {
-                const channelId = channel.twitch.twitch_id;
-                const isStreamerOnlineNow = await botUtils.isStreamOnline(channelId);
-            } catch (error) {
-                console.error(`Error checking stream status for ${channel}:`, error);
-            }
-        }))
-
-        await Promise.all(channelList.map(async (channel) => {
-            const normalizedChannel = `#${channel.toLowerCase().trim()}`;
-
-            try {
                 const isStreamerOnlineNow = await botUtils.isStreamOnline(channel);
-                if ((botUtils.isCreatorChannel(channel) || isStreamerOnlineNow) && !connectedChannels.includes(normalizedChannel)) {
-                    channelsToJoin.add(normalizedChannel);
+                if ((botUtils.isCreatorChannel(channel) || isStreamerOnlineNow) && !connectedChannels.includes(channel)) {
+                    channelsToJoin.add(channel);
                     hasChanges = true;
-                } else if (!isStreamerOnlineNow && !botUtils.isCreatorChannel(channel) && connectedChannels.includes(normalizedChannel)) {
-                    channelsToLeave.add(normalizedChannel);
+                } else if (!isStreamerOnlineNow && !botUtils.isCreatorChannel(channel) && connectedChannels.includes(channel)) {
+                    channelsToLeave.add(channel);
                     hasChanges = true;
                 }
             } catch (error) {
-                console.error(`Error checking stream status for ${normalizedChannel}:`, error);
+                console.error(`Error checking stream status for ${channel}:`, error);
             }
         }));
 
@@ -184,4 +167,4 @@ async function changeList(client, {
     }
 }
 
-module.exports = { updateChannels, connectedChannels };
+module.exports = {updateChannels, connectedChannels};

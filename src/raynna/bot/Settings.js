@@ -36,33 +36,29 @@ class Settings {
         }
     }
 
-    check(id) {
+    check(channel) {
         this.settings = this.loadSettings();
-        if (!this.settings[id]) {
-            this.settings[id] = { name: "" };
-            console.log(`Created new settings for ${id}: ${JSON.stringify(this.settings[id])}`);
+        let hasChanges = false;
+        if (!this.settings[channel]) {
+            this.settings[channel] = { id: -1 };
+            console.log(`Created new settings for ${channel}: ${JSON.stringify(this.settings[channel])}`);
+            hasChanges = true;
         }
-        if (this.settings[id]) {
-            if (!this.settings[id].esportal) {
-                this.settings[id].esportal = { name: "", id: -1};
-                console.log(`Added twitch settings for: ${id}`);
+        if (this.settings[channel]) {
+            if (!this.settings[channel].esportal) {
+                this.settings[channel].esportal = { name: "", id: -1};
+                console.log(`Added twitch settings for: ${channel}`);
+                hasChanges = true;
             }
-            if (!this.settings[id].toggled) {
-                this.settings[id].toggled = { };
-                console.log(`Added toggle settings for: ${id}`);
+            if (!this.settings[channel].toggled) {
+                this.settings[channel].toggled = { };
+                console.log(`Added toggle settings for: ${channel}`);
+                hasChanges = true;
             }
-            console.log(`Settings for channel ${id}: ${JSON.stringify(this.settings[id])}`)
-        }
-    }
-
-    getChannelId(channel) {
-        for (const s in this.settings) {
-            if (s.name.toLowerCase() === channel.toLowerCase()) {
-
+            if (hasChanges) {
+                this.saveSettings();
             }
-        }
-        if (!this.settings.map(c => c.name.toLowerCase().includes(channel.toLowerCase()))) {
-            return this.settings[c];
+            console.log(`Settings for channel ${channel}: ${JSON.stringify(this.settings[channel])}`)
         }
     }
 

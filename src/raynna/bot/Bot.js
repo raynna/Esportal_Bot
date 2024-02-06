@@ -2,13 +2,13 @@ require('dotenv').config();
 
 const tmi = require("tmi.js");
 
-const Commands = require('./Commands');
+const Commands = require('./command/Commands');
 const commands = new Commands();
 const Settings = require('./Settings');
 const settings = new Settings();
 
-const { updateChannels, connectedChannels } = require('./Channels');
-const { sendMessage } = require('./BotUtils');
+const { updateChannels, connectedChannels } = require('./channels/Channels');
+const { sendMessage } = require('./utils/BotUtils');
 
 const client = new tmi.Client({
     connection: {
@@ -33,7 +33,7 @@ setInterval(() => {
     });
 }, updateInterval);
 
-const request = require('./Request');
+const request = require('./requests/Request');
 
 client.on('connected', (address, port) =>  {
     try {
@@ -63,26 +63,27 @@ const regexpCommand = new RegExp(/^!([a-zA-Z0-9]+)(?:\s+)?([\s\S]*)?/);
 
 client.on('message', async (channel, tags, message, self) => {
     try {
-        console.log(`on message`);
         const isNotBot = tags && tags.username && tags.username.toLowerCase() !== process.env.TWITCH_BOT_USERNAME;
         if (isNotBot) {
             const match = message.match(regexpCommand);
-            console.log(`match: ${match}`);
             if (match) {
-                console.log(`command format found`);
                 const [, command, argument] = match;
                 //const commandInstance = commandManager.commands[command.toLowerCase()];
                 const commandTrigger = command.toLowerCase();
                 const commandInstance = commands.commands[commandTrigger];
-                console.log(`commandInstance ${commandInstance}, trigger: ${commandTrigger}`);
                 if (commandInstance && typeof commandInstance.execute === 'function') {
                     try {
-                        console.log(`executed command`);
                         const playerIsMod = tags.mod
                         const isModerator = await client.isMod(channel, process.env.TWITCH_BOT_USERNAME);
                         const isStreamer = channel.slice(1).toLowerCase() === tags.username.toLowerCase();
-                        if (!isModerator) {
-                            return;
+                        if (commands.isModeratorCommand(commandInstance)) {
+                            const playerIsMod = tags.mod;
+                            const isStreamer = channel.slice(1).toLowerCase() === tags.username.toLowerCase();
+                            const isCreator = tags.username.toLowerCase() === process.env.CREATOR_CHANNEL;
+                            if (!(playerIsMod || isStreamer || isCreator)) {
+                                await sendMessage(client, channel, 'Only the streamer or a moderator can use this command.');
+                                return;
+                            }
                         }
                         console.log(`${playerIsMod ? `[Mod]` : isStreamer ? `[Streamer]` : `[Viewer]`} ${tags.username} has used the command: ${message} in channel: ${channel}`);
                         const result = await commandInstance.execute(tags, channel, argument, client);
@@ -105,7 +106,7 @@ const readline = require('readline');
 
 process.on('SIGINT', async () => {
     let closingReason = false;
-    closingReason = "DEBUG";
+    closingReason = " ";
     try {
         if (!closingReason) {
             const rl = readline.createInterface({
@@ -121,12 +122,12 @@ process.on('SIGINT', async () => {
         }
 
         console.log(`Bot going offline, Reason: ${closingReason.trim() !== '' ? closingReason : 'No Reason'}.`);
-        /*for (const channel of connectedChannels) {
-            const isModerator = await isBotModerator(client, channel);
+        for (const channel of connectedChannels) {
+            const isModerator = await isModerator(client, channel);
             if (isModerator && closingReason.trim() !== '') {
-                await leaveMessage(client, channel, closingReason);
+                await sendMessage(client, channel, closingReason);
             }
-        }*/
+        }
         await new Promise(resolve => setTimeout(resolve, 2000));
         await client.disconnect();
         process.exit(0);

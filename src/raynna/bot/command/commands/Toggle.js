@@ -1,11 +1,11 @@
-
+const Settings = require('../../Settings');
 
 class Toggle {
     constructor() {
         this.moderator = true;
         this.name = 'Toggle';
-        this.settings = require('../Settings').getInstance();
         this.commands = require('../Commands').getInstance();
+        this.settings = new Settings();
     }
 
     async execute(tags, channel, argument, client) {
@@ -31,10 +31,10 @@ class Toggle {
             if (command === 'toggle') {
                 return `You can't toggle this command.`;
             }
-            const commandClass = this.commands.findCommandClassByTrigger(command, validCommands);
+            const commandClass = this.commands.findCommandClassByTrigger(command, Object.keys(validCommands));
             if (commandClass) {
                 const triggers = this.commands.getCommandTriggers(commandClass);
-                return `todo`//this.settings.toggle(channel, command, triggers);
+                return this.settings.toggle(channel, command, triggers);
             }
             return `Couldn't find any command with trigger ${command}.`;
         } catch (error) {

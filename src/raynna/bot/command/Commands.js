@@ -63,7 +63,7 @@ class Commands {
         return fs.readdirSync(commandsFolder)
             .filter(file => fs.statSync(path.join(commandsFolder, file)).isFile())
             .map(file => path.parse(file).name)
-            .filter(command => command.toLowerCase() !== 'toggle');
+            .filter(command => command.moderator) === true;
     }
 
     commandExists(commandName) {
@@ -103,8 +103,7 @@ class Commands {
     }
 
     isModeratorCommand(commandInstance) {
-        const isModeratorCommand = commandInstance?.moderator ?? false;
-        return isModeratorCommand;
+        return commandInstance?.moderator ?? false;
     }
 }
 
