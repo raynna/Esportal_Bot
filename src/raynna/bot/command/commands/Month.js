@@ -53,7 +53,7 @@ class Month {
                 const month = (mostRecentDate.getMonth() + 1).toString().padStart(2, '0');
                 const year = mostRecentDate.getFullYear();
                 const formattedDate = `${day}/${month}-${year}`;
-                return `${esportalName} has not played any games within 30 days. Last played: ${formattedDate} @${tags.username}`;
+                return `${esportalName} has not played any games within 30 days. Last played: ${formattedDate}`;
             }
 
             const eloChanges = gamesData.map(match => match.elo_change).filter(eloChange => eloChange !== undefined);
@@ -64,7 +64,7 @@ class Month {
             const totalDeaths = deaths.reduce((sum, death) => sum + death, 0);
             const ratio = deaths !== 0 ? (totalKills / totalDeaths).toFixed(2) : "N/A";
             const totalEloChange = eloChanges.reduce((sum, eloChange) => sum + eloChange, 0);
-            return `${esportalName}'s stats latest 30 days: Games: ${totalGames}, Rating: ${totalEloChange > 0 ? '+' : ''}${totalEloChange}, Kills: ${totalKills}, Deaths: ${totalDeaths}, K/D: ${ratio} @${tags.username}`;
+            return `${esportalName}'s stats latest 30 days: Games: ${totalGames}, Rating: ${totalEloChange > 0 ? '+' : ''}${totalEloChange}, Kills: ${totalKills}, Deaths: ${totalDeaths}, K/D: ${ratio}`;
         } catch (error) {
             console.error('Error on EsportalName Command:', error);
             return 'An error occurred while registering Esportal Name.';

@@ -1,0 +1,20 @@
+[2024-02-07T17:45:52.511Z] [process.processTicksAndRejections] [ERROR]: esportal_bot is now connected!
+[2024-02-07T17:48:51.782Z] [process.processTicksAndRejections] [ERROR]: esportal_bot is now connected!
+[2024-02-07T17:48:54.360Z] [process.processTicksAndRejections] [ERROR]: test
+[2024-02-07T17:49:10.916Z] [checkGathers] [ERROR]: first Run DaMan
+[2024-02-07T17:49:11.010Z] [checkGathers] [ERROR]: first Run Raynna
+[2024-02-07T17:49:11.112Z] [checkGathers] [ERROR]: first Run Maluwa
+[2024-02-07T17:49:11.198Z] [checkGathers] [ERROR]: first Run Tiimwork
+[2024-02-07T17:50:21.582Z] [process.processTicksAndRejections] [ERROR]: esportal_bot is now connected!
+[2024-02-07T17:50:24.256Z] [process.processTicksAndRejections] [ERROR]: test
+[2024-02-07T17:50:40.812Z] [checkGathers (    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)] [ERROR]: first Run DaMan
+[2024-02-07T17:50:40.904Z] [checkGathers (    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)] [ERROR]: first Run Tiimwork
+[2024-02-07T17:50:40.991Z] [checkGathers (    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)] [ERROR]: first Run Raynna
+[2024-02-07T17:50:41.102Z] [checkGathers (    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)] [ERROR]: first Run Maluwa
+[2024-02-07T17:52:04.048Z] [process.processTicksAndRejections] [ERROR]: esportal_bot is now connected!
+[2024-02-07T17:52:06.348Z] [process.processTicksAndRejections] [ERROR]: test
+[2024-02-07T17:52:23.283Z] [checkGathers (node:internal/process/task_queues)] [ERROR]: first Run DaMan
+[2024-02-07T17:52:23.413Z] [checkGathers (node:internal/process/task_queues)] [ERROR]: first Run Raynna
+[2024-02-07T17:52:23.581Z] [checkGathers (node:internal/process/task_queues)] [ERROR]: first Run Tiimwork
+[2024-02-07T17:52:23.693Z] [checkGathers (node:internal/process/task_queues)] [ERROR]: first Run Maluwa
+[2024-02-07T17:54:23.454Z] [process.processTicksAndRejections] [ERROR]: test

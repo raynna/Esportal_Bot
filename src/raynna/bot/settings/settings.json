@@ -28,10 +28,11 @@
       "username": "War1aT"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 14511747,
+      "name": "War1aT"
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   },
   "38009707": {
     "twitch": {
@@ -94,10 +95,11 @@
       "username": "DaMan_gg"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 167071457,
+      "name": "DaMan"
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   },
   "63232377": {
     "twitch": {
@@ -183,10 +185,13 @@
       "username": "honkoh"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 35717472,
+      "name": "honko"
     },
-    "toggled": []
+    "toggled": [
+      "rank"
+    ],
+    "font": "bold"
   },
   "142494422": {
     "twitch": {
@@ -217,10 +222,11 @@
       "username": "StakarN"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 153072907,
+      "name": "StakarN"
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   },
   "150145098": {
     "twitch": {
@@ -239,10 +245,11 @@
       "username": "Lossalito"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 31059629,
+      "name": "Lossa"
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   },
   "156546552": {
     "twitch": {

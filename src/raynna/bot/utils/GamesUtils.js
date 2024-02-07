@@ -4,7 +4,6 @@ const {getData, RequestType} = require('../requests/Request');
 async function getGamesData(userId, duration = "daily") {
     try {
         const allMatches = await getAllMatches(userId, duration);
-
         const currentDate = new Date();
         const filterFunction =
             duration === "monthly"
@@ -36,28 +35,31 @@ async function getAllMatches(userId, duration) {
     let maxPages = duration === "monthly" ? 80 : duration === "weekly" ? 20 : 5;
 
     for (let page = 1; page <= maxPages; page++) {
-        const {data: recentGames} = await getData(RequestType.RecentMatchData, userId, page);
-        if (!recentGames || recentGames.length === 0) {
-            console.log(`recent games are null or length 0`);
+        let recentGames = await getData(RequestType.RecentMatchData, userId, page);
+        if (!recentGames.data) {
+            if (recentGames.errorMessage) {
+                console.log('[GameUtils]', recentGames.errorMessage);
+            }
+            console.log('[GameUtils]', `UserId: ${userId}, Page: ${page}, RecentGames is null.`);
             break;
         }
 
         if (page > 1) {
             const lastMatchOfPreviousPage = allMatches[allMatches.length - 1];
-            const firstMatchOfCurrentPage = recentGames[0];
+            const firstMatchOfCurrentPage = recentGames.data[0];
 
             if (
                 lastMatchOfPreviousPage &&
                 firstMatchOfCurrentPage &&
                 lastMatchOfPreviousPage.inserted === firstMatchOfCurrentPage.inserted
             ) {
-                recentGames.shift();
+                recentGames.data.shift();
             }
         }
-        allMatches.push(...recentGames);
+        allMatches.push(...recentGames.data);
 
         const currentDate = new Date();
-        const match = recentGames[recentGames.length - 1];
+        const match = recentGames.data[recentGames.data.length - 1];
         const stopCondition = duration === "monthly" ? !isMatchPlayedWithinMonth(match.inserted, currentDate) :
             duration === "weekly" ? !isMatchPlayedWithinLastWeek(match.inserted, currentDate) :
                 !isMatchPlayedToday(match.inserted, currentDate);

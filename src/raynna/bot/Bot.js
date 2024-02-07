@@ -7,6 +7,9 @@ const commands = new Commands();
 const Settings = require('./settings/Settings');
 const settings = new Settings();
 
+const Logger = require('./log/Logger');
+const logger = new Logger();
+
 const { isBotModerator, showGatherLobby } = require('./utils/BotUtils');
 
 const { updateChannels, connectedChannels } = require('./channels/Channels');
@@ -24,6 +27,7 @@ const client = new tmi.Client({
 
 client.connect().then(() => {
     console.log(`${process.env.TWITCH_BOT_USERNAME} is now connected!`);
+    //console.log(`${process.env.TWITCH_BOT_USERNAME} is now connected!`);
 }).catch((error) => {
     console.error(error);
 });
@@ -35,15 +39,8 @@ setInterval(() => {
     });
 }, updateInterval);
 
-const matchInterval = 20 * 1000;
-setInterval(() => {
-    checkMatches(client, connectedChannels).then( async() => {
 
-    });
-}, matchInterval);
-
-
-const maintenanceInterval = 30 * 1000;
+const maintenanceInterval = 60 * 1000;
 setInterval(() => {
     checkMaintenance(client, connectedChannels).then( async() => {
 
@@ -56,6 +53,12 @@ setInterval(() => {
 
     });
 }, gatherInterval);
+const matchInterval = 20 * 1000;
+setInterval(() => {
+    checkMatches(client, connectedChannels).then( async() => {
+
+    });
+}, matchInterval);
 
 function findChangedLobbies(previous, current) {
     return current.filter((lobby) => !previous.some((prevLobby) => prevLobby.id === lobby.id));
@@ -68,6 +71,7 @@ client.on('connected', (address, port) =>  {
         setTimeout(() => {
             updateChannels(client).then(async r => {
                 await addChannel("raynnacs");
+                logger.error(`test`);
                 /*if (!settings.saveSettings.hasOwnProperty("#raynnacs")) {
                     const requestType = RequestType.TwitchUser;
                     const { data: twitchData, errorMessage: twitchError } = await getData(requestType, "raynnacs");
@@ -163,10 +167,13 @@ client.on('message', async (channel, tags, message, self) => {
                                 return;
                             }
                         }
-                        console.log(`${playerIsMod ? `[Mod]` : isStreamer ? `[Streamer]` : `[Viewer]`} ${tags.username} has used the command: ${message} in channel: ${channel}`);
-                        const result = await commandInstance.execute(tags, channel, argument, client);
-                        await sendMessage(client, channel, result);
-                        console.log(`[Channel: ${channel}] ${isModerator ? `[Mod] ` : ``}Esportal_Bot: ${result}`);
+                        console.log(`[Channel: ${channel}]`, `${playerIsMod ? `[Mod: ` : isStreamer ? `[Streamer: ` : `[Viewer: `}${tags.username}] has used the command: ${message}`);
+                        let result = await commandInstance.execute(tags, channel, argument, client);
+                        if (result) {
+                            result += ` @${tags.username}`;
+                            await sendMessage(client, channel, result);
+                        }
+                        //console.log(`[Channel: ${channel}] ${isModerator ? `[Mod] ` : ``}Esportal_Bot: ${result}`);
                     } catch (e) {
                         const errorMessage = e.message || 'An error occurred while processing the command.';
                         await sendMessage(client, channel, errorMessage);

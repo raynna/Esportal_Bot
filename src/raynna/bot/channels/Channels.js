@@ -54,7 +54,7 @@ async function updateChannels(client) {
             for (const channel of channelsToJoin) {
                 try {
                     await client.join(channel);
-                    console.log(`Joined channel: ${channel}`);
+                    console.log(`[Channels]`, `[UpdateChannels]`, `${channel}`);
                 } catch (joinError) {
                     console.error(`Error joining ${channel}:`, joinError);
                 }
@@ -63,7 +63,7 @@ async function updateChannels(client) {
             for (const channel of channelsToLeave) {
                 try {
                     await client.part(channel);
-                    console.log(`Left channel: ${channel}`);
+                    console.log(`[LEFT CHANNEL]`, channel);
                 } catch (leaveError) {
                     console.error(`Error leaving ${channel}:`, leaveError);
                 }
@@ -71,15 +71,15 @@ async function updateChannels(client) {
             connectedChannels = Array.from(new Set([...connectedChannels, ...Array.from(channelsToJoin)]))
                 .filter(channel => !channelsToLeave.has(channel));
             if (channelsToJoin.size > 0) {
-                console.log('Channels joined:', Array.from(channelsToJoin));
+                console.log(`[CHANNELS JOINED]`, Array.from(channelsToJoin));
             }
 
             if (channelsToLeave.size > 0) {
-                console.log('Channels left:', channelsToLeave);
+                console.log('[CHANNELS LEFT]', Array.from(channelsToLeave));
             }
         } else {
             const timestamp = new Date().toLocaleString();
-            console.log(`Channels list updated at ${timestamp}: ${connectedChannels.length} channels connected - ${connectedChannels.join(', ')}`);
+            console.log(`[CHANNEL UPDATE]`, `[${timestamp}]: ${connectedChannels.length} channels connected - ${connectedChannels.join(', ')}`);
         }
 
     } catch (error) {

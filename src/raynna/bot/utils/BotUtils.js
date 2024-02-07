@@ -10,6 +10,9 @@ const request = require('../requests/Request');
 const {getFontStyle} = require('./Fonts');
 const {getMapName} = require("./MapUtils");
 
+const Logger = require('../log/Logger');
+const logger = new Logger();
+
 let maintenance = {player: null, maintenance: false};
 
 async function checkMaintenance(client, connectedChannels) {
@@ -17,12 +20,14 @@ async function checkMaintenance(client, connectedChannels) {
         const {data: maintenanceData, errorMessage: maintenanceError} = await getData(RequestType.Maintenance);
         for (const connected of connectedChannels) {
             if (maintenanceError) {
+                continue;
+            }
+            if (!maintenanceData) {
                 if (maintenance[connected]) {
                     maintenance[connected] = false;
-                    await sendMessage(client, connected, `Esportal maintenance is now complete, You should now be able to play again!`);
+                    await sendMessage(client, connected, 'Esportal maintenance is now complete, You should now be able to play again!');
                     continue;
                 }
-                continue;
             }
             if (maintenanceData) {
                 if (!maintenance[connected]) {
@@ -37,6 +42,7 @@ async function checkMaintenance(client, connectedChannels) {
 }
 
 let currentGather = {player: null, gatherId: null};
+let firstRun = true;
 
 async function checkGathers(client, connectedChannels) {
     settings.savedSettings = await settings.loadSettings();
@@ -51,23 +57,33 @@ async function checkGathers(client, connectedChannels) {
             continue;
         }
         const {current_gather_id, username} = userData;
-        //console.log(`currentMatch: ${current_match.id} for user: ${username}`);
-        if (current_gather_id) {
-            if (!currentGather[username]) {
-                let result = await showGatherLobby(client, connected, userData, current_gather_id);
-                currentGather[username] = null;
-                await sendMessage(client, connected, result);
-                continue;
-            }
+        if (firstRun) {
+            currentGather[username] = current_gather_id;
+            continue;
         }
-        currentGather[username] = current_gather_id;
+        //console.log(`currentMatch: ${current_match.id} for user: ${username}`);
+        if (current_gather_id && !currentGather[username]) {
+            let result = await showGatherLobby(client, connected, userData, current_gather_id);
+            if (result) {
+                currentGather[username] = current_gather_id;
+                await sendMessage(client, connected, result);
+            }
+            continue;
+        }
+        if (!current_gather_id && currentGather[username]) {
+            currentGather[username] = null;
+            continue;
+        }
+        currentGather[username] = current_gather_id
         //console.log(`currentMatch[username]: ${JSON.stringify(currentMatch[username])}`);
     }
+    firstRun = false;
 }
 
 
 let shownMatchUpdate = {player: null, shown: false};
 let currentMatch = {player: null, matchId: null};
+let firstMatchCheck = true;
 
 async function checkMatches(client, connectedChannels) {
     try {
@@ -84,31 +100,44 @@ async function checkMatches(client, connectedChannels) {
             }
             const {current_match, username} = userData;
             //console.log(`currentMatch: ${current_match.id} for user: ${username}`);
+            if (firstMatchCheck) {
+                currentMatch[username] = current_match.id;
+                continue;
+            }
+
             if (current_match && current_match.id !== null) {
                 if (!currentMatch[username]) {
                     let result = await showStartedMatch(userData, current_match.id);
-                    currentMatch[username] = null;
-                    await sendMessage(client, connected, result);
+                    if (result) {
+                        currentMatch[username] = current_match.id;
+                        if (result.includes("already started")) {
+                            continue;
+                        }
+                        await sendMessage(client, connected, result);
+                    }
                     continue;
                 }
-                let result = await showMatchUpdate(userData, current_match.id);
                 currentMatch[username] = current_match.id;
+                let result = await showMatchUpdate(userData, current_match.id);
                 if (result) {
                     await sendMessage(client, connected, result);
                     continue;
                 }
             }
-            if (current_match && current_match.id === null && currentMatch[username]) {
-                let result = await showCompletedMatch(userData, currentMatch[username]);
-                currentMatch[username] = null;
-                if (result) {
-                    await sendMessage(client, connected, result);
+            if (current_match && current_match.id === null) {
+                if (currentMatch[username]) {
+                    let result = await showCompletedMatch(userData, currentMatch[username]);
+                    if (result) {
+                        currentMatch[username] = null;
+                        await sendMessage(client, connected, result);
+                    }
                     continue;
                 }
+                currentMatch[username] = current_match.id;
             }
-            currentMatch[username] = current_match.id;
             //console.log(`currentMatch[username]: ${JSON.stringify(currentMatch[username])}`);
         }
+        firstMatchCheck = false;
     } catch (error) {
         console.log(error);
     }
@@ -136,7 +165,7 @@ async function showCompletedMatch(userData, matchId) {
         if (team1_score < 13 && team2_score < 13) {
             return `${userData.username}'s match was just cancelled.`;
         }
-        return `${userData.username} just ${matchResult} a match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsratio}%, K/D: ${ratio}, MVP: ${mvp}`;
+        return `${userData.username} just ${matchResult} a match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsratio}%, K/D: ${ratio}, MVP: ${mvp.username}`;
     } catch (error) {
         console.log(error);
     }
@@ -150,17 +179,17 @@ async function showStartedMatch(userData, matchId) {
             return '';
         }
         const {username} = userData;
-        const {team1_score, team2_score, players, map_id} = matchData;
+        const {team1_score, team2_score, team1_avg_elo, team2_avg_elo, players, map_id} = matchData;
         let player = players.find(player => player.username.toLowerCase() === username.toLowerCase());
-        const mvp = players.reduce((prev, current) => (prev.kills > current.kills) ? prev : current);
-        const {kills, deaths, assists, headshots} = player;
         const streamersTeam = player ? player.team : 'N/A';
-        const won = streamersTeam === 1 ? team1_score > team2_score : team2_score > team1_score;
         const displayScore = streamersTeam === 1 ? `${team1_score} : ${team2_score}` : `${team2_score} : ${team1_score}`;
-        const ratio = deaths !== 0 ? (kills / deaths).toFixed(2) : "N/A";
-        const hsratio = headshots !== 0 ? Math.floor(headshots / kills * 100).toFixed(0) : "0";
         const mapName = await getMapName(map_id);
-        return `${userData.username} just started a match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsratio}%, K/D: ${ratio}.`;
+        const combinedElo = team1_avg_elo + team2_avg_elo;
+        const averageElo = Math.round(combinedElo / 2);
+        if (team1_score > 0 || team2_score > 0) {
+            return 'already started';
+        }
+        return `${userData.username} just started a match: ${mapName}, Score: (${displayScore}), Average elo: ${averageElo}`;
     } catch (error) {
         console.log(error);
     }
@@ -176,8 +205,15 @@ async function showMatchUpdate(userData, matchId) {
         const {username} = userData;
         const {team1_score, team2_score, players, map_id} = matchData;
         const halfTime = (team1_score + team2_score === 12);
-        const overTime = (team1_score === 12 && team2_score === 12)
-        if ((overTime || halfTime) && shownMatchUpdate[userData.username] === false) {
+        const overTime = (team1_score === 12 && team2_score === 12);
+
+        if (shownMatchUpdate[userData.username]) {
+            if (!overTime && !halfTime) {
+                shownMatchUpdate[userData.username] = false;
+            }
+            return '';
+        }
+        if ((overTime || halfTime) && !shownMatchUpdate[userData.username]) {
             let player = players.find(player => player.username.toLowerCase() === username.toLowerCase());
             const mvp = players.reduce((prev, current) => (prev.kills > current.kills) ? prev : current);
             const {kills, deaths, assists, headshots} = player;
@@ -189,9 +225,8 @@ async function showMatchUpdate(userData, matchId) {
             const mapName = await getMapName(map_id);
             const matchStatus = halfTime ? "reached half time on their" : "is now in a overtime";
             shownMatchUpdate[userData.username] = true;
-            return `${userData.username} ${matchStatus} match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsratio}%, K/D: ${ratio}.`;
+            return `${userData.username} ${matchStatus} match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsratio}%, K/D: ${ratio}, current MVP: ${mvp.username}.`;
         }
-        shownMatchUpdate[userData.username] = false;
     } catch (error) {
         console.log(error);
     }
@@ -224,11 +259,11 @@ async function showGatherLobby(client, channel, userData, gatherId) {
 
         const isModerator = await isBotModerator(client, channel);
         const isCreator = creator.id === userData.id;
-        const gatherResult = isCreator ? "started" : "joined";
+        const gatherResult = isCreator ? "started a gather lobby" : `joined ${gather.creator.username}'s gather lobby`;
         if (isModerator) {
-            return `${userData.username} ${gatherResult} a gather: https://www.esportal.com/sv/gather/${gatherId} ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
+            return `${userData.username} ${gatherResult}: https://www.esportal.com/sv/gather/${gatherId} ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
         }
-        return `${userData.username} ${gatherResult} a gather lobby, ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
+        return `${userData.username} ${gatherResult}, ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
     } catch (error) {
         console.log(error);
     }
@@ -286,8 +321,10 @@ async function changeFont(text, channel) {
 
 async function sendMessage(client, channel, message) {
     try {
-        console.log(`bot message: ${message}`);
-        client.say(channel, await changeFont(message, channel));
+        if (message) {
+            console.log(`[Channel: ${channel}]`, message);
+            client.say(channel, await changeFont(message, channel));
+        }
     } catch (error) {
         console.error(error);
     }

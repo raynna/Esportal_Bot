@@ -10,6 +10,9 @@ const Headers = {
 const RequestType = {
     Maintenance: {
         name: 'Maintenance check',
+        errors: {
+            badRequest: '',
+        },
         link: 'https://esportal.com/api/matchmaking/maintenance_mode_cs2'
     },
     StreamStatus: {
@@ -98,6 +101,7 @@ const RequestType = {
         link: 'https://esportal.com/api/gather/list?_=0&region_id=0&subregion_id=0'
     }
 };
+
 /**
  * Usage examples:
  * [Request.getData(RequestType.UserData, name);]
@@ -142,64 +146,64 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
         try {
             return await requestFunction(additionalParams);
         } catch (error) {
-            if (attempt < maxRetries) {
-                //if reached ratelimit, wait 1 second before retry
-                if (error.response && error.response.status === 429) {
-                    await delay(1000);
-                }
-                continue;
-            }
-            if (error.response) {
-                switch (error.response.status) {
-                    case 400:
-                        if (additionalParams && additionalParams.badRequest) {
-                            //console.log(additionalParams.badRequest);
-                            return {data: null, errorMessage: additionalParams.badRequest};
-                        }
-                        return {data: null, errorMessage: `Bad request: ${error.response.status}`};
-                    case 401:
-                        return {data: null, errorMessage: `Unauthorized: ${error.response.status}`};
-                    case 403:
-                        return {data: null, errorMessage: `Forbidden: ${error.response.status}`};
-                    case 404:
-                        if (additionalParams && additionalParams.notFound) {
-                            console.log(additionalParams.notFound);
-                            return {data: null, errorMessage: additionalParams.notFound};
-                        }
-                        return {data: null, errorMessage: `Not found: ${error.response.status}`};
-                    case 408:
-                        return {data: null, errorMessage: `Request Timeout: ${error.response.status}`};
-                    case 429:
-                        await delay(1000);
-                        return {
-                            data: null,
-                            errorMessage: `Requested information to frequently, try again later.`
-                        };
-                    case 500:
-                        return {data: null, errorMessage: `Internal Server Error: ${error.response.status}`};
-                    case 502:
-                        return {data: null, errorMessage: `Bad Gateway: ${error.response.status}`};
-                    case 503:
-                        return {data: null, errorMessage: `Service Unavailable: ${error.response.status}`};
-                    case 504:
-                        return {data: null, errorMessage: `Gateway Timeout: ${error.response.status}`};
-                    case 522:
-                        if (additionalParams && additionalParams.webisteDown) {
-                            console.log(additionalParams.webisteDown);
-                            return {data: null, errorMessage: additionalParams.webisteDown};
-                        }
-                        return {
-                            data: null,
-                            errorMessage: `Esportal website seems to be offline at the moment.`
-                        };
-                    default:
-                        return {
-                            data: null,
-                            errorMessage: `Unhandled error: ${error.response.status} - ${error.response.statusText}`
-                        };
+            if (error.response && error.response.status === 429) {
+                if (attempt < maxRetries) {
+                    await delay(2000);
+                    continue;
                 }
             }
-            return {data: null, errorMessage: `Unknown error, contact ${process.env.CREATOR_CHANNEL}`};
+            if (attempt === maxRetries) {
+                if (error.response) {
+                    switch (error.response.status) {
+                        case 400:
+                            if (additionalParams && additionalParams.badRequest) {
+                                //console.log(additionalParams.badRequest);
+                                return {data: null, errorMessage: additionalParams.badRequest};
+                            }
+                            return {data: null, errorMessage: `Bad request: ${error.response.status}`};
+                        case 401:
+                            return {data: null, errorMessage: `Unauthorized: ${error.response.status}`};
+                        case 403:
+                            return {data: null, errorMessage: `Forbidden: ${error.response.status}`};
+                        case 404:
+                            if (additionalParams && additionalParams.notFound) {
+                                console.log(additionalParams.notFound);
+                                return {data: null, errorMessage: additionalParams.notFound};
+                            }
+                            return {data: null, errorMessage: `Not found: ${error.response.status}`};
+                        case 408:
+                            return {data: null, errorMessage: `Request Timeout: ${error.response.status}`};
+                        case 429:
+                            return {
+                                data: null,
+                                errorMessage: `Requested information to frequently, try again later.`
+                            };
+                        case 500:
+                            return {data: null, errorMessage: `Internal Server Error: ${error.response.status}`};
+                        case 502:
+                            return {data: null, errorMessage: `Bad Gateway: ${error.response.status}`};
+                        case 503:
+                            return {data: null, errorMessage: `Service Unavailable: ${error.response.status}`};
+                        case 504:
+                            return {data: null, errorMessage: `Gateway Timeout: ${error.response.status}`};
+                        case 522:
+                            if (additionalParams && additionalParams.webisteDown) {
+                                console.log(additionalParams.webisteDown);
+                                return {data: null, errorMessage: additionalParams.webisteDown};
+                            }
+                            return {
+                                data: null,
+                                errorMessage: `Esportal website seems to be offline at the moment.`
+                            };
+                        default:
+                            return {
+                                data: null,
+                                errorMessage: `Unhandled error: ${error.response.status} - ${error.response.statusText}`
+                            };
+                    }
+                }
+                return {data: null, errorMessage: `Unknown error, contact ${process.env.CREATOR_CHANNEL}`};
+            }
         }
     }
 }
