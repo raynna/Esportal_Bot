@@ -7,11 +7,10 @@ const commands = new Commands();
 const Settings = require('./settings/Settings');
 const settings = new Settings();
 
-const { isBotModerator } = require('./utils/BotUtils');
+const { isBotModerator, showGatherLobby } = require('./utils/BotUtils');
 
 const { updateChannels, connectedChannels } = require('./channels/Channels');
-const { sendMessage, addChannel } = require('./utils/BotUtils');
-const { getMapName } = require('./utils/MapUtils');
+const { sendMessage, addChannel, checkMatches } = require('./utils/BotUtils');
 
 const client = new tmi.Client({
     connection: {
@@ -36,30 +35,12 @@ setInterval(() => {
     });
 }, updateInterval);
 
-async function showGatherLobby(userData, gatherId, channel, client) {
-    const { data: gatherList, errorMessage: errorMessage } = await getData(RequestType.GatherList);
-    if (errorMessage) {
-        return;
-    }
-    const gather = gatherList.find(gather => gather.id === gatherId);
-    if (!gather) {
-        return;
-    }
-    const { data: gatherData, errorMessage: gatherError } = await getData(RequestType.GatherData, gatherId);
-    if (gatherError) {
-        return;
-    }
-    const { players } = gatherData;
-    const { picked_players, map_id } = gather;
-    const waiting = players.length - picked_players;
-    const mapName = await getMapName(map_id);
+const matchInterval = 10 * 1000;
+setInterval(() => {
+    checkMatches(client, connectedChannels).then( async() => {
 
-    const isModerator = await isBotModerator(client, channel);
-    if (isModerator) {
-        return `${userData.username} started a gather: https://www.esportal.com/sv/gather/${gatherId} ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
-    }
-    return `${userData.username} started a gather lobby, ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
-}
+    });
+}, matchInterval);
 
 let previousLobbies = null;
 

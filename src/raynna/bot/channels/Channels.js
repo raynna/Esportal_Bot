@@ -4,23 +4,12 @@ const Settings = require('../settings/Settings');
 const settings = new Settings();
 
 const botUtils = require('../utils/BotUtils');
-const {sendMessage} = require('../utils/BotUtils');
+const {sendMessage, findChangedGames, show, showCompletedMatch} = require('../utils/BotUtils');
 
-const channelsFilePath = './data/channels.txt';
+const { getData, RequestType } = require('../requests/Request');
+
 let connectedChannels = [];
 
-
-function getChannelsFromFile(filePath) {
-    try {
-        const data = fs.readFileSync(filePath, 'utf8');
-        return data.split('\n').map(channel => channel.trim()).filter(channel => channel);
-    } catch (error) {
-        console.error(`Error getting files from ${filePath}.`);
-        return [];
-    }
-}
-
-//"user_id":"30538510" twitch user_id for pani1337
 async function updateChannels(client) {
     try {
         settings.savedSettings = await settings.loadSettings();
@@ -92,10 +81,15 @@ async function updateChannels(client) {
             const timestamp = new Date().toLocaleString();
             console.log(`Channels list updated at ${timestamp}: ${connectedChannels.length} channels connected - ${connectedChannels.join(', ')}`);
         }
+
     } catch (error) {
         console.error('An error occurred in updateChannels:', error);
     }
 }
+
+
+
+
 
 async function changeList(client, {
     channel,

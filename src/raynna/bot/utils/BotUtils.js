@@ -7,7 +7,86 @@ const settings = new Settings();
 const {getData, RequestType} = require('../requests/Request');
 const request = require('../requests/Request');
 
-const { getFontStyle } = require('./Fonts');
+const {getFontStyle} = require('./Fonts');
+const {getMapName} = require("./MapUtils");
+
+let currentMatch = {player: null, matchId: null};
+
+async function checkMatches(client, connectedChannels) {
+    settings.savedSettings = await settings.loadSettings();
+    for (const connected of connectedChannels) {
+        const channelEntry = Object.values(settings.savedSettings).find(entry => entry.twitch.channel === connected);
+        let esportalName = null;
+        if (channelEntry) {
+            esportalName = channelEntry.esportal.name;
+        }
+        const {data: userData, errorMessage: userError} = await getData(RequestType.UserData, esportalName);
+        if (userError) {
+            continue;
+        }
+        const {current_match, username} = userData;
+        console.log(`currentMatch: ${current_match.id} for user: ${username}`);
+        if (current_match.id === null && currentMatch[username]) {
+            await sendMessage(client, connected, await showCompletedMatch(userData, currentMatch[username]));
+            currentMatch[username] = null;
+            continue;
+        }
+        currentMatch[username] = current_match.id;
+        console.log(`currentMatch[username]: ${JSON.stringify(currentMatch[username])}`);
+    }
+}
+
+async function showCompletedMatch(userData, matchId) {
+    const {data: matchData, errorMessage: matchError} = await getData(RequestType.MatchData, matchId);
+    if (matchError) {
+        return;
+    }
+    const {username} = userData.data;
+    const {team1_score, team2_score, players, map_id} = matchData.data;
+    let player = players.find(player => player.username.toLowerCase() === username.toLowerCase());
+    const mvp = players.reduce((prev, current) => (prev.kills > current.kills) ? prev : current);
+    const {kills, deaths, assists, headshots} = player;
+    const streamersTeam = player ? player.team : 'N/A';
+    const won = streamersTeam === 1 ? team1_score > team2_score : team2_score > team1_score;
+    const displayScore = streamersTeam === 1 ? `${team1_score} : ${team2_score}` : `${team2_score} : ${team1_score}`;
+    const matchResult = won ? "WON" : "LOST";
+    const ratio = deaths !== 0 ? (kills / deaths).toFixed(2) : "N/A";
+    const hsratio = headshots !== 0 ? Math.floor(headshots / kills * 100).toFixed(0) : "0";
+    const mapName = await getMapName(map_id);
+    if (team1_score === 0 && team2_score === 0) {
+        return `${userData.username}'s match was just cancelled.`;
+    }
+    return `${userData.username} just ${matchResult} a match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsratio}%, K/D: ${ratio}, MVP: ${mvp}`;
+}
+
+function findChangedGames(previous, current) {
+    return current.filter((game) => !previous.some((prevGame) => prevGame.id === game.id));
+}
+
+async function showGatherLobby(userData, gatherId, channel, client) {
+    const {data: gatherList, errorMessage: errorMessage} = await getData(RequestType.GatherList);
+    if (errorMessage) {
+        return;
+    }
+    const gather = gatherList.find(gather => gather.id === gatherId);
+    if (!gather) {
+        return;
+    }
+    const {data: gatherData, errorMessage: gatherError} = await getData(RequestType.GatherData, gatherId);
+    if (gatherError) {
+        return;
+    }
+    const {players} = gatherData;
+    const {picked_players, map_id} = gather;
+    const waiting = players.length - picked_players;
+    const mapName = await getMapName(map_id);
+
+    const isModerator = await isBotModerator(client, channel);
+    if (isModerator) {
+        return `${userData.username} started a gather: https://www.esportal.com/sv/gather/${gatherId} ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
+    }
+    return `${userData.username} started a gather lobby, ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
+}
 
 async function addChannel(channel) {
     const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
@@ -96,4 +175,13 @@ function isCreatorChannel(channel) {
     return channel.toLowerCase().replace(/#/g, '') === process.env.CREATOR_CHANNEL;
 }
 
-module.exports = {isCreatorChannel, isStreamOnline, sendMessage, addChannel, isBotModerator}
+module.exports = {
+    isCreatorChannel,
+    isStreamOnline,
+    sendMessage,
+    addChannel,
+    isBotModerator,
+    showGatherLobby,
+    findChangedGames,
+    checkMatches
+}

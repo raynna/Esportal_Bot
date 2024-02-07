@@ -77,6 +77,14 @@ const RequestType = {
         link: 'https://esportal.com/api/user_profile/get_latest_matches?_=0&id={userId}&page=1&v=2',
         values: ['{userId}']
     },
+    MatchData: {
+        name: 'Match Data',
+        errors: {
+            notFound: 'This match does not exist on Esportal'
+        },
+        link: 'https://esportal.com/api/match/get?_=0&id=${matchId}',
+        values: ['{matchId}']
+    },
     MapData: {
         name: 'Map Data',
         link: 'https://esportal.com/api/maps'
