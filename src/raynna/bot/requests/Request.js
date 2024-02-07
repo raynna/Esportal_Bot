@@ -111,16 +111,20 @@ const RequestType = {
  * @returns {Promise<{data: null, errorMessage}|{data: null, errorMessage: (string|*)}|*|{data: null, errorMessage: string}>}
  */
 async function getData(requestType, ...args) {
-    let url = requestType.link;
-    for (const [index, value] of args.entries()) {
-        url = url.replace(requestType.values[index], typeof value === 'string' ? value.toLowerCase() : value);
-    }
-    const headers = requestType.requiredHeader || {};
-    const config = {
-        headers: headers
-    }
-    //console.log(`url: ${url}, values: ${args}`);
     try {
+        if (args === undefined) {
+            console.log("Undefined name");
+            return { data: null, errorMessage: 'undefined name'};
+        }
+        let url = requestType.link;
+        for (const [index, value] of args.entries()) {
+            url = url.replace(requestType.values[index], typeof value === 'string' ? value.toLowerCase() : value);
+        }
+        const headers = requestType.requiredHeader || {};
+        const config = {
+            headers: headers
+        }
+    //console.log(`url: ${url}, values: ${args}`)
         return await handleRequest(async () => {
             const response = await axios.get(url, config);
             return {data: response.data, errorMessage: null};
@@ -139,7 +143,7 @@ async function getData(requestType, ...args) {
  *
  * @returns {Promise<{data: null, errorMessage: (string|*)}|{data: null, errorMessage: (string|*)}|*|{data: null, errorMessage: string}>}
  */
-async function handleRequest(requestFunction, additionalParams = {}, maxRetries = 3) {
+async function handleRequest(requestFunction, additionalParams = {}, maxRetries = 5) {
     const delay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -148,7 +152,7 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
         } catch (error) {
             if (error.response && error.response.status === 429) {
                 if (attempt < maxRetries) {
-                    await delay(2000);
+                    await delay(5000);
                     continue;
                 }
             }

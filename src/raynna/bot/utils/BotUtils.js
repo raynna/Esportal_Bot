@@ -322,7 +322,7 @@ async function changeFont(text, channel) {
 async function sendMessage(client, channel, message) {
     try {
         if (message) {
-            console.log(`[Channel: ${channel}]`, message);
+            console.log(`[Channel: ${channel}]`, `[Esportal_Bot]`, message);
             client.say(channel, await changeFont(message, channel));
         }
     } catch (error) {

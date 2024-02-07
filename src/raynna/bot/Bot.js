@@ -71,7 +71,6 @@ client.on('connected', (address, port) =>  {
         setTimeout(() => {
             updateChannels(client).then(async r => {
                 await addChannel("raynnacs");
-                logger.error(`test`);
                 /*if (!settings.saveSettings.hasOwnProperty("#raynnacs")) {
                     const requestType = RequestType.TwitchUser;
                     const { data: twitchData, errorMessage: twitchError } = await getData(requestType, "raynnacs");

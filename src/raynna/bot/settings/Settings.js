@@ -43,56 +43,64 @@ class Settings {
     }
 
     async getEsportalName(twitchId) {
-        await this.check(twitchId);
-        if (!this.savedSettings[twitchId]) {
-            return "";
+        try {
+            await this.check(twitchId);
+            if (!this.savedSettings[twitchId]) {
+                return "";
+            }
+            return this.savedSettings[twitchId].esportal.name;
+        } catch (error) {
+            console.error(error);
         }
-        return this.savedSettings[twitchId].esportal.name;
     }
 
     async check(twitchId) {
-        if (twitchId === -1 || twitchId === undefined) {
-            console.log("tried to save a undefined twitchId");
-            return;
-        }
-        this.savedSettings = await this.loadSettings();
-        let hasChanges = false;
-        if (!this.savedSettings[twitchId]) {
-            this.savedSettings[twitchId] = {};
-            console.log(`Created new settings for ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId])}`);
-            hasChanges = true;
-        }
-        if (this.savedSettings[twitchId]) {
-            if (!this.savedSettings[twitchId].twitch) {
-                this.savedSettings[twitchId].twitch = {channel: "", username: ""};
-                console.log(`Added twitch settings for ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId].twitch)}`);
+        try {
+            if (twitchId === -1 || twitchId === undefined) {
+                console.log("tried to save a undefined twitchId");
+                return;
+            }
+            this.savedSettings = await this.loadSettings();
+            let hasChanges = false;
+            if (!this.savedSettings[twitchId]) {
+                this.savedSettings[twitchId] = {};
+                console.log(`Created new settings for ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId])}`);
                 hasChanges = true;
             }
-            if (!this.savedSettings[twitchId].esportal) {
-                this.savedSettings[twitchId].esportal = {name: "", id: -1};
-                console.log(`Added esportal settings for: ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId].esportal)}`);
-                hasChanges = true;
+            if (this.savedSettings[twitchId]) {
+                if (!this.savedSettings[twitchId].twitch) {
+                    this.savedSettings[twitchId].twitch = {channel: "", username: ""};
+                    console.log(`Added twitch settings for ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId].twitch)}`);
+                    hasChanges = true;
+                }
+                if (!this.savedSettings[twitchId].esportal) {
+                    this.savedSettings[twitchId].esportal = {name: "", id: -1};
+                    console.log(`Added esportal settings for: ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId].esportal)}`);
+                    hasChanges = true;
+                }
+                if (!this.savedSettings[twitchId].toggled || !Array.isArray(this.savedSettings[twitchId].toggled)) {
+                    this.savedSettings[twitchId].toggled = [];
+                    console.log(`Added toggle settings for: ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId].toggled)}`);
+                    hasChanges = true;
+                }
+                if (!this.savedSettings[twitchId].font) {
+                    this.savedSettings[twitchId].font = "bold";
+                    console.log(`Added font settings for: ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId].font)}`);
+                    hasChanges = true;
+                }
+                if (this.savedSettings[twitchId].toggled && !Array.isArray(this.savedSettings[twitchId].toggled)) {
+                    this.savedSettings[twitchId].toggled = [];
+                    console.log(`Tranformed toggle settings for: ${twitchId} to array: ${JSON.stringify(this.savedSettings[twitchId].toggled)}`);
+                    hasChanges = true;
+                }
+                if (hasChanges) {
+                    await this.saveSettings();
+                    this.savedSettings = await this.loadSettings();
+                    console.log(`Settings after save for twitch user ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId])}`);
+                }
             }
-            if (!this.savedSettings[twitchId].toggled || !Array.isArray(this.savedSettings[twitchId].toggled)) {
-                this.savedSettings[twitchId].toggled = [];
-                console.log(`Added toggle settings for: ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId].toggled)}`);
-                hasChanges = true;
-            }
-            if (!this.savedSettings[twitchId].font) {
-                this.savedSettings[twitchId].font = "bold";
-                console.log(`Added font settings for: ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId].font)}`);
-                hasChanges = true;
-            }
-            if (this.savedSettings[twitchId].toggled && !Array.isArray(this.savedSettings[twitchId].toggled)) {
-                this.savedSettings[twitchId].toggled = [];
-                console.log(`Tranformed toggle settings for: ${twitchId} to array: ${JSON.stringify(this.savedSettings[twitchId].toggled)}`);
-                hasChanges = true;
-            }
-            if (hasChanges) {
-                await this.saveSettings();
-                this.savedSettings = await this.loadSettings();
-                console.log(`Settings after save for twitch user ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId])}`);
-            }
+        } catch (error) {
+            console.error(error);
         }
     }
 

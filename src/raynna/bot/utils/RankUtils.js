@@ -14,10 +14,14 @@ function calculateRankAndPlacement(userData, gameType) {
         'Gold I': 1000,
         Silver: 0
     };
+    const { game_stats, leaderboard_position } = userData;
 
-    const elo = userData.game_stats[gameType].elo;
-    const rankLocked = userData.game_stats[gameType].rank_locked || false;
-    const matchesUntilRankUnlocked = userData.game_stats[gameType].matches_until_rank_unlocked || 0;
+    const gameStats = game_stats[gameType];
+
+    const { elo, rank_locked, matches_until_rank_unlocked } = gameStats;
+
+    const rankLocked = rank_locked || false;
+    const matchesUntilRankUnlocked = matches_until_rank_unlocked || 0;
 
     if (rankLocked) {
         const lockedRank = rankNames.find(r => elo >= rankThresholds[r]) || 'Unranked';
@@ -28,7 +32,7 @@ function calculateRankAndPlacement(userData, gameType) {
     }
 
     const rank = rankNames.find(r => elo >= rankThresholds[r]) || 'Unranked';
-    const placement = "Placement: " + (gameType == 2 && userData.leaderboard_position || 'N/A');
+    const placement = "Placement: " + (gameType === 2 && leaderboard_position || 'N/A');
     return { rank, placement };
 }
 
