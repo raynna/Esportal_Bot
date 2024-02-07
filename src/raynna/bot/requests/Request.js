@@ -8,6 +8,10 @@ const Headers = {
 }
 
 const RequestType = {
+    Maintenance: {
+        name: 'Maintenance check',
+        link: 'https://esportal.com/api/matchmaking/maintenance_mode_cs2'
+    },
     StreamStatus: {
         name: 'Steam Status Data',
         requiredHeader: Headers.TWITCH_HEADER,

@@ -10,6 +10,32 @@ const request = require('../requests/Request');
 const {getFontStyle} = require('./Fonts');
 const {getMapName} = require("./MapUtils");
 
+let maintenance = {player: null, maintenance: false};
+
+async function checkMaintenance(client, connectedChannels) {
+    try {
+        const {data: maintenanceData, errorMessage: maintenanceError} = await getData(RequestType.Maintenance);
+        for (const connected of connectedChannels) {
+            if (maintenanceError) {
+                if (maintenance[connected]) {
+                    maintenance[connected] = false;
+                    await sendMessage(client, connected, `Esportal maintenance is now complete, You should now be able to play again!`);
+                    continue;
+                }
+                continue;
+            }
+            if (maintenanceData) {
+                if (!maintenance[connected]) {
+                    maintenance[connected] = true;
+                    await sendMessage(client, connected, `Maintenance: ${maintenanceData}`);
+                }
+            }
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 let currentGather = {player: null, gatherId: null};
 
 async function checkGathers(client, connectedChannels) {
@@ -305,5 +331,6 @@ module.exports = {
     showGatherLobby,
     findChangedGames,
     checkMatches,
-    checkGathers
+    checkGathers,
+    checkMaintenance
 }

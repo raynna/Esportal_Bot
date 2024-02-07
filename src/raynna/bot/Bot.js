@@ -10,7 +10,7 @@ const settings = new Settings();
 const { isBotModerator, showGatherLobby } = require('./utils/BotUtils');
 
 const { updateChannels, connectedChannels } = require('./channels/Channels');
-const { sendMessage, addChannel, checkMatches, checkGathers } = require('./utils/BotUtils');
+const { sendMessage, addChannel, checkMatches, checkGathers, checkMaintenance } = require('./utils/BotUtils');
 
 const client = new tmi.Client({
     connection: {
@@ -41,6 +41,14 @@ setInterval(() => {
 
     });
 }, matchInterval);
+
+
+const maintenanceInterval = 30 * 1000;
+setInterval(() => {
+    checkMaintenance(client, connectedChannels).then( async() => {
+
+    });
+}, maintenanceInterval);
 
 const gatherInterval = 20 * 1000;
 setInterval(() => {
