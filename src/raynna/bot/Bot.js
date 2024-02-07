@@ -10,7 +10,7 @@ const settings = new Settings();
 const { isBotModerator, showGatherLobby } = require('./utils/BotUtils');
 
 const { updateChannels, connectedChannels } = require('./channels/Channels');
-const { sendMessage, addChannel, checkMatches } = require('./utils/BotUtils');
+const { sendMessage, addChannel, checkMatches, checkGathers } = require('./utils/BotUtils');
 
 const client = new tmi.Client({
     connection: {
@@ -35,70 +35,19 @@ setInterval(() => {
     });
 }, updateInterval);
 
-const matchInterval = 10 * 1000;
+const matchInterval = 20 * 1000;
 setInterval(() => {
     checkMatches(client, connectedChannels).then( async() => {
 
     });
 }, matchInterval);
 
-let previousLobbies = null;
+const gatherInterval = 20 * 1000;
+setInterval(() => {
+    checkGathers(client, connectedChannels).then( async() => {
 
-const updateGathers = 3 * 1000;
-setInterval(async () => {
-    try {
-        const esportalResponse = await getData(RequestType.GatherList);
-        if (esportalResponse.errorMessage) {
-            console.log(esportalResponse.errorMessage);
-            return;
-        }
-        const currentLobbies = esportalResponse.data;
-        //console.log("current lobbies: " + currentLobbies.map(changed => `Lobby Name: ${changed.name}, Creator: ${changed.creator.username}`).join(', '));
-
-        if (previousLobbies !== null) {
-            const changedLobbies = findChangedLobbies(previousLobbies, currentLobbies);
-            //console.log("changed lobbies: " + changedLobbies.map(changed => `Lobby Name: ${changed.name}, Creator: ${changed.creator.username}`).join(', '));
-
-            for (const lobby of changedLobbies) {
-                //console.log("changed lobby: " + lobby.name + ", creator: " + lobby.creator.username + "");
-                const esportalName = lobby.creator.username;
-                settings.savedSettings = await settings.loadSettings();
-                const channelEntry  = Object.values(settings.savedSettings).find(entry => entry.esportal.name === esportalName);
-                let channel = null;
-                if (channelEntry) {
-                    channel = channelEntry.twitch.channel;
-                }
-                if (!channel) {
-                    console.log(`New gather created found by ${esportalName}, but they are not registered on the bot.`);
-                }
-                if (channel) {
-                    //console.log("channel: " + channel);
-                    let message = ``;
-                    //console.log(message);
-                    const { data: userData, errorMessage: userError } = await getData(RequestType.UserData, esportalName);
-                    if (userError) {
-                        return;
-                    }
-                    const isModerator = await isBotModerator(client, channel);
-                    if (!isModerator) {
-                        return;
-                    }
-                    const { current_gather_id } = userData;
-                    if (!current_gather_id) {
-                        return;
-                    }
-                    message = await showGatherLobby(userData, current_gather_id, channel, client);
-                    console.log(`[Gather created] ${message}`);
-                    await sendMessage(client, channel, message);
-                }
-            }
-        }
-        previousLobbies = currentLobbies;
-        //console.log("set previous lobbies to: " + previousLobbies.map(changed => `Lobby Name: ${changed.name}, Creator: ${changed.creator.username}`).join(', '));
-    } catch (error) {
-        console.error('Error fetching Esportal data:', error);
-    }
-}, updateGathers);
+    });
+}, gatherInterval);
 
 function findChangedLobbies(previous, current) {
     return current.filter((lobby) => !previous.some((prevLobby) => prevLobby.id === lobby.id));

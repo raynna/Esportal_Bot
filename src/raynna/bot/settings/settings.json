@@ -369,6 +369,7 @@
       "name": "",
       "id": -1
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   }
 }

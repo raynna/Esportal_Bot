@@ -82,7 +82,7 @@ const RequestType = {
         errors: {
             notFound: 'This match does not exist on Esportal'
         },
-        link: 'https://esportal.com/api/match/get?_=0&id=${matchId}',
+        link: 'https://esportal.com/api/match/get?_=0&id={matchId}',
         values: ['{matchId}']
     },
     MapData: {
