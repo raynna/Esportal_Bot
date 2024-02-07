@@ -111,7 +111,6 @@ const RequestType = {
  * @returns {Promise<{data: null, errorMessage}|{data: null, errorMessage: (string|*)}|*|{data: null, errorMessage: string}>}
  */
 async function getData(requestType, ...args) {
-    try {
         if (args === undefined) {
             console.log("Undefined name");
             return { data: null, errorMessage: 'undefined name'};
@@ -124,6 +123,7 @@ async function getData(requestType, ...args) {
         const config = {
             headers: headers
         }
+    try {
     //console.log(`url: ${url}, values: ${args}`)
         return await handleRequest(async () => {
             const response = await axios.get(url, config);
@@ -152,7 +152,7 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
         } catch (error) {
             if (error.response && error.response.status === 429) {
                 if (attempt < maxRetries) {
-                    await delay(5000);
+                    await delay(2000);
                     continue;
                 }
             }
