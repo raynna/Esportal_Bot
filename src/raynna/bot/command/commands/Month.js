@@ -12,6 +12,7 @@ class Month {
     }
 
     async execute(tags, channel, argument, client) {
+        return `This command is currently disabled`;
         try {
             const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
             const { data: twitch, errorMessage: twitchError } = await getData(RequestType.TwitchUser, channelWithoutHash);

@@ -4,13 +4,8 @@ const tmi = require("tmi.js");
 
 const Commands = require('./command/Commands');
 const commands = new Commands();
-const Settings = require('./settings/Settings');
-const settings = new Settings();
 
-const Logger = require('./log/Logger');
-const logger = new Logger();
-
-const { isBotModerator, showGatherLobby } = require('./utils/BotUtils');
+const { isBotModerator } = require('./utils/BotUtils');
 
 const { updateChannels, connectedChannels } = require('./channels/Channels');
 const { sendMessage, addChannel, checkMatches, checkGathers, checkMaintenance } = require('./utils/BotUtils');
@@ -25,8 +20,9 @@ const client = new tmi.Client({
     },
 });
 
-client.connect().then(() => {
-    console.log(`${process.env.TWITCH_BOT_USERNAME} is now connected!`);
+console.log("Connecting..");
+client.connect().then(() =>  {
+    console.log(`Connected!`);
     //console.log(`${process.env.TWITCH_BOT_USERNAME} is now connected!`);
 }).catch((error) => {
     console.error(error);
@@ -47,30 +43,24 @@ setInterval(() => {
     });
 }, maintenanceInterval);
 
-const gatherInterval = 20 * 1000;
+const gatherInterval = 15 * 1000;
 setInterval(() => {
     checkGathers(client, connectedChannels).then( async() => {
 
     });
 }, gatherInterval);
-const matchInterval = 20 * 1000;
+const matchInterval = 15 * 1000;
 setInterval(() => {
     checkMatches(client, connectedChannels).then( async() => {
 
     });
 }, matchInterval);
 
-function findChangedLobbies(previous, current) {
-    return current.filter((lobby) => !previous.some((prevLobby) => prevLobby.id === lobby.id));
-}
-
-const request = require('./requests/Request');
-
 client.on('connected', (address, port) =>  {
     try {
         setTimeout(() => {
             updateChannels(client).then(async r => {
-                await addChannel("raynnacs");
+                //await addChannel("raynnacs");
                 /*if (!settings.saveSettings.hasOwnProperty("#raynnacs")) {
                     const requestType = RequestType.TwitchUser;
                     const { data: twitchData, errorMessage: twitchError } = await getData(requestType, "raynnacs");
@@ -156,6 +146,8 @@ client.on('message', async (channel, tags, message, self) => {
                         cooldowns[tags.username][channel] = currentTime;
                         const playerIsMod = tags.mod
                         const isModerator = await client.isMod(channel, process.env.TWITCH_BOT_USERNAME);
+                        if (!isModerator)
+                            return;
                         const isStreamer = channel.slice(1).toLowerCase() === tags.username.toLowerCase();
                         if (commands.isModeratorCommand(commandInstance)) {
                             const playerIsMod = tags.mod;
@@ -187,7 +179,6 @@ client.on('message', async (channel, tags, message, self) => {
 });
 
 const readline = require('readline');
-const {RequestType, getData} = require("./requests/Request");
 
 process.on('SIGINT', async () => {
     let closingReason = false;

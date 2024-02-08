@@ -111,10 +111,6 @@ const RequestType = {
  * @returns {Promise<{data: null, errorMessage}|{data: null, errorMessage: (string|*)}|*|{data: null, errorMessage: string}>}
  */
 async function getData(requestType, ...args) {
-        if (args === undefined) {
-            console.log("Undefined name");
-            return { data: null, errorMessage: 'undefined name'};
-        }
         let url = requestType.link;
         for (const [index, value] of args.entries()) {
             url = url.replace(requestType.values[index], typeof value === 'string' ? value.toLowerCase() : value);
@@ -122,7 +118,7 @@ async function getData(requestType, ...args) {
         const headers = requestType.requiredHeader || {};
         const config = {
             headers: headers
-        }
+        };
     try {
     //console.log(`url: ${url}, values: ${args}`)
         return await handleRequest(async () => {
@@ -148,13 +144,17 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
+            await delay(1000 * attempt);
             return await requestFunction(additionalParams);
         } catch (error) {
             if (error.response && error.response.status === 429) {
-                if (attempt < maxRetries) {
-                    await delay(2000);
-                    continue;
-                }
+                const retryAfter = error.response.headers['retry-after'] || 2;
+                //console.log("error status: 429, waiting: " + retryAfter * 1000);
+                await delay(retryAfter * 1000);
+            } else if (error.code === 'ECONNABORTED') {
+                return { data: null, errorMessage: `Request Timeout: ${error.message}`};
+            } else {
+                await delay(2 ** attempt * 1000);
             }
             if (attempt === maxRetries) {
                 if (error.response) {

@@ -19,10 +19,11 @@ class Commands {
             const commandFiles = fs.readdirSync(path.join('src/raynna/bot/command/commands/'));
 
             console.log('Found command files:', commandFiles);
+            console.log('Command files:', commandFiles.length);
             commandFiles.forEach(file => {
                 if (!file.startsWith('_')) {
                     try {
-                        console.log(`Loading command from file: ${file}`);
+                        //console.log(`Loading command from file: ${file}`);
 
                         const CommandClass = require(`./commands/${file}`);
                         const commandInstance = new CommandClass();
@@ -38,13 +39,13 @@ class Commands {
                                     this.commands[triggerName] = commandInstance;
                                 });
 
-                                console.log(`Command ${commandName} loaded with triggers: ${commandInstance.triggers.join(', ')}`);
+                                //console.log(`Command ${commandName} loaded with triggers: ${commandInstance.triggers.join(', ')}`);
                             } else {
                                 // If no triggers, add only the main instance name
                                 const commandName = file.replace('.js', '').toLowerCase();
                                 this.commands[commandName] = commandInstance;
 
-                                console.log(`Command ${commandName} loaded without triggers`);
+                                //console.log(`Command ${commandName} loaded without triggers`);
                             }
                         } else {
                             console.error(`Error loading command from file ${file}: CommandClass is not a constructor.`);
@@ -54,8 +55,7 @@ class Commands {
                     }
                 }
             });
-
-            console.log('Commands loaded successfully:', this.commands);
+            //console.log('Commands loaded successfully:', this.commands.size);
         } catch (error) {
             console.error('Error reading command files:', error);
         }

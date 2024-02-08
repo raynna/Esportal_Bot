@@ -54,7 +54,7 @@ async function updateChannels(client) {
             for (const channel of channelsToJoin) {
                 try {
                     await client.join(channel);
-                    console.log(`[Channels]`, `[UpdateChannels]`, `${channel}`);
+                    //console.log(`[Channels]`, `[UpdateChannels]`, `${channel}`);
                 } catch (joinError) {
                     console.error(`Error joining ${channel}:`, joinError);
                 }
@@ -63,7 +63,7 @@ async function updateChannels(client) {
             for (const channel of channelsToLeave) {
                 try {
                     await client.part(channel);
-                    console.log(`[LEFT CHANNEL]`, channel);
+                    //console.log(`[LEFT CHANNEL]`, channel);
                 } catch (leaveError) {
                     console.error(`Error leaving ${channel}:`, leaveError);
                 }
