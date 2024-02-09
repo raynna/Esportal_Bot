@@ -10,8 +10,7 @@ const request = require('../requests/Request');
 const {getFontStyle} = require('./Fonts');
 const {getMapName} = require("./MapUtils");
 
-const Logger = require('../log/Logger');
-const logger = new Logger();
+const { info } = require('../log/Logger');
 
 let maintenance = {player: null, maintenance: false};
 
@@ -41,232 +40,88 @@ async function checkMaintenance(client, connectedChannels) {
     }
 }
 
-let currentGather = {player: null, gatherId: null};
-let firstRun = true;
+let previousGathers = null;
 
-async function checkGathers(client, connectedChannels) {
+function findChangedList(previous, current) {
+    const changedId = current.filter((gather) => !previous.some((previousGather) => previousGather.id === gather.id));
+    const changedPlayers = current.filter((gather) => !previous.some((previousGather) => arraysEqual(previousGather.players, gather.players)));
+
+    return [...new Set(changedId.concat(changedPlayers))];
+}
+
+function arraysEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) return false;
+    for (let i = 0; i < arr1.length; i++) {
+        if (arr1[i] !== arr2[i]) return false;
+    }
+    return true;
+}
+
+async function checkGatherList(client, connectedChannels) {
     settings.savedSettings = await settings.loadSettings();
-    for (const connected of connectedChannels) {
-        const channelEntry = Object.values(settings.savedSettings).find(entry => entry.twitch.channel === connected);
-        let esportalName = null;
-        if (channelEntry) {
-            esportalName = channelEntry.esportal.name;
-        }
-        const {data: userData, errorMessage: userError} = await getData(RequestType.UserData, esportalName);
-        if (userError) {
-            continue;
-        }
-        const {current_gather_id, username} = userData;
-        if (firstRun) {
-            currentGather[username] = current_gather_id;
-            continue;
-        }
-        //console.log(`currentMatch: ${current_match.id} for user: ${username}`);
-        if (current_gather_id && !currentGather[username]) {
-            let result = await showGatherLobby(client, connected, userData, current_gather_id);
-            if (result) {
-                currentGather[username] = current_gather_id;
-                await sendMessage(client, connected, result);
-            }
-            continue;
-        }
-        if (!current_gather_id && currentGather[username]) {
-            currentGather[username] = null;
-            continue;
-        }
-        currentGather[username] = current_gather_id
-        //console.log(`currentMatch[username]: ${JSON.stringify(currentMatch[username])}`);
+    const {data: list, errorMessage: listError} = await getData(RequestType.GatherList);
+    if (listError) {
+        return;
     }
-    firstRun = false;
-}
-
-
-let shownMatchUpdate = {player: null, shown: false};
-let currentMatch = {player: null, matchId: null};
-let firstMatchCheck = true;
-
-async function checkMatches(client, connectedChannels) {
-    try {
-        settings.savedSettings = await settings.loadSettings();
-        for (const connected of connectedChannels) {
-            const channelEntry = Object.values(settings.savedSettings).find(entry => entry.twitch.channel === connected);
-            let esportalName = null;
-            if (channelEntry) {
-                esportalName = channelEntry.esportal.name;
-            }
-            const {data: userData, errorMessage: userError} = await getData(RequestType.UserData, esportalName);
-            if (userError) {
-                continue;
-            }
-            const {current_match, username} = userData;
-            //console.log(`currentMatch: ${current_match.id} for user: ${username}`);
-            if (firstMatchCheck) {
-                currentMatch[username] = current_match.id;
-                continue;
-            }
-
-            if (current_match && current_match.id !== null) {
-                if (!currentMatch[username]) {
-                    let result = await showStartedMatch(userData, current_match.id);
-                    if (result) {
-                        currentMatch[username] = current_match.id;
-                        if (result.includes("already started")) {
-                            continue;
+    let streamers = [];
+    if (previousGathers) {
+        const changedList = findChangedList(previousGathers, list);
+        if (changedList.length > 0) {
+            const result = Object.keys(changedList).map(index => {
+                const name = changedList[index].name;
+                const players = changedList[index].players.length;
+                return `${name} (${players})`;
+            }).join(', ');
+            info("GATHERLIST CHANGE", `${changedList.length} changed gathers: ${result}`)
+            for (const gather of changedList) {
+                const {players} = gather;
+                for (const playerId of players) {
+                    const entry = Object.values(settings.savedSettings).find(entry => entry && entry.esportal && entry.esportal.id === playerId);
+                    if (entry) {
+                        const previousGather = previousGathers.find(prevGather => prevGather.id === gather.id);
+                        if (previousGather) {
+                            const {players} = previousGather;
+                            const findSamePlayer = Object.values(players).find(player => player === playerId);
+                            if (findSamePlayer) {
+                                continue;
+                            }
                         }
-                        await sendMessage(client, connected, result);
+                        const isConnected = Object.values(connectedChannels).find(channel => entry && entry.twitch && entry.twitch.channel === channel)
+                        if (isConnected) {
+                            streamers.push(entry);
+                        }
                     }
-                    continue;
-                }
-                currentMatch[username] = current_match.id;
-                let result = await showMatchUpdate(userData, current_match.id);
-                if (result) {
-                    await sendMessage(client, connected, result);
-                    continue;
                 }
             }
-            if (current_match && current_match.id === null) {
-                if (currentMatch[username]) {
-                    let result = await showCompletedMatch(userData, currentMatch[username]);
-                    if (result) {
-                        currentMatch[username] = null;
-                        await sendMessage(client, connected, result);
-                    }
+        }
+        if (streamers.length > 0) {
+            for (const entries of streamers) {
+                const channel = entries.twitch.channel;
+                const userId = entries.esportal.id;
+
+                const gather = Object.values(list).find(entry => entry.players.includes(userId));
+                if (!gather) {
                     continue;
                 }
-                currentMatch[username] = current_match.id;
+                const username = entries.esportal.name;
+                const {id, name, creator, players, picked_players, map_id} = gather;
+                const mapName = await getMapName(map_id);
+                const waiting = players.length - picked_players;
+                const isModerator = await isBotModerator(client, channel);
+                const isCreator = creator.id === userId;
+                let result;
+                const gatherResult = isCreator ? "started a gather lobby" : `joined ${creator.username}'s gather lobby`;
+                if (isModerator) {
+                    result = `${username} ${gatherResult}: https://www.esportal.com/sv/gather/${id} ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
+                } else {
+                    result = `${username} ${gatherResult}: ${name}, ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`
+                }
+                await sendMessage(client, channel, result);
+
             }
-            //console.log(`currentMatch[username]: ${JSON.stringify(currentMatch[username])}`);
         }
-        firstMatchCheck = false;
-    } catch (error) {
-        console.log(error);
     }
-}
-
-async function showCompletedMatch(userData, matchId) {
-    try {
-        const {data: matchData, errorMessage: matchError} = await getData(RequestType.MatchData, matchId);
-        if (matchError) {
-            console.log(matchError);
-            return "";
-        }
-        const {username} = userData;
-        const {team1_score, team2_score, players, map_id} = matchData;
-        let player = players.find(player => player.username.toLowerCase() === username.toLowerCase());
-        const mvp = players.reduce((prev, current) => (prev.kills > current.kills) ? prev : current);
-        const {kills, deaths, assists, headshots} = player;
-        const streamersTeam = player ? player.team : 'N/A';
-        const won = streamersTeam === 1 ? team1_score > team2_score : team2_score > team1_score;
-        const displayScore = streamersTeam === 1 ? `${team1_score} : ${team2_score}` : `${team2_score} : ${team1_score}`;
-        const matchResult = won ? "WON" : "LOST";
-        const ratio = deaths !== 0 ? (kills / deaths).toFixed(2) : "N/A";
-        const hsratio = headshots !== 0 ? Math.floor(headshots / kills * 100).toFixed(0) : "0";
-        const mapName = await getMapName(map_id);
-        if (team1_score < 13 && team2_score < 13) {
-            return `${userData.username}'s match was just cancelled.`;
-        }
-        return `${userData.username} just ${matchResult} a match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsratio}%, K/D: ${ratio}, MVP: ${mvp.username}`;
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-async function showStartedMatch(userData, matchId) {
-    try {
-        const {data: matchData, errorMessage: matchError} = await getData(RequestType.MatchData, matchId);
-        if (matchError) {
-            console.log(matchError);
-            return '';
-        }
-        const {username} = userData;
-        const {team1_score, team2_score, team1_avg_elo, team2_avg_elo, players, map_id} = matchData;
-        let player = players.find(player => player.username.toLowerCase() === username.toLowerCase());
-        const streamersTeam = player ? player.team : 'N/A';
-        const displayScore = streamersTeam === 1 ? `${team1_score} : ${team2_score}` : `${team2_score} : ${team1_score}`;
-        const mapName = await getMapName(map_id);
-        const combinedElo = team1_avg_elo + team2_avg_elo;
-        const averageElo = Math.round(combinedElo / 2);
-        if (team1_score > 0 || team2_score > 0) {
-            return 'already started';
-        }
-        return `${userData.username} just started a match: ${mapName}, Score: (${displayScore}), Average elo: ${averageElo}`;
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-async function showMatchUpdate(userData, matchId) {
-    try {
-        const {data: matchData, errorMessage: matchError} = await getData(RequestType.MatchData, matchId);
-        if (matchError) {
-            console.log(matchError);
-            return '';
-        }
-        const {username} = userData;
-        const {team1_score, team2_score, players, map_id} = matchData;
-        const halfTime = (team1_score + team2_score === 12);
-        const overTime = (team1_score === 12 && team2_score === 12);
-
-        if (shownMatchUpdate[userData.username]) {
-            if (!overTime && !halfTime) {
-                shownMatchUpdate[userData.username] = false;
-            }
-            return '';
-        }
-        if ((overTime || halfTime) && !shownMatchUpdate[userData.username]) {
-            let player = players.find(player => player.username.toLowerCase() === username.toLowerCase());
-            const mvp = players.reduce((prev, current) => (prev.kills > current.kills) ? prev : current);
-            const {kills, deaths, assists, headshots} = player;
-            const streamersTeam = player ? player.team : 'N/A';
-            const won = streamersTeam === 1 ? team1_score > team2_score : team2_score > team1_score;
-            const displayScore = streamersTeam === 1 ? `${team1_score} : ${team2_score}` : `${team2_score} : ${team1_score}`;
-            const ratio = deaths !== 0 ? (kills / deaths).toFixed(2) : "N/A";
-            const hsratio = headshots !== 0 ? Math.floor(headshots / kills * 100).toFixed(0) : "0";
-            const mapName = await getMapName(map_id);
-            const matchStatus = halfTime ? "reached half time on their" : "is now in a overtime";
-            shownMatchUpdate[userData.username] = true;
-            return `${userData.username} ${matchStatus} match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsratio}%, K/D: ${ratio}, current MVP: ${mvp.username}.`;
-        }
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-function findChangedGames(previous, current) {
-    return current.filter((game) => !previous.some((prevGame) => prevGame.id === game.id));
-}
-
-async function showGatherLobby(client, channel, userData, gatherId) {
-    try {
-        const {data: gatherList, errorMessage: errorMessage} = await getData(RequestType.GatherList);
-        if (errorMessage) {
-            return "";
-        }
-        const gather = gatherList.find(gather => gather.id === gatherId);
-        if (!gather) {
-            console.log("error comparing gatherId from List");
-            return "";
-        }
-        const {data: gatherData, errorMessage: gatherError} = await getData(RequestType.GatherData, gatherId);
-        if (gatherError) {
-            console.log(gatherError);
-            return "";
-        }
-        const {players, creator} = gatherData;
-        const {picked_players, map_id} = gather;
-        const waiting = players.length - picked_players;
-        const mapName = await getMapName(map_id);
-
-        const isModerator = await isBotModerator(client, channel);
-        const isCreator = creator.id === userData.id;
-        const gatherResult = isCreator ? "started a gather lobby" : `joined ${gather.creator.username}'s gather lobby`;
-        if (isModerator) {
-            return `${userData.username} ${gatherResult}: https://www.esportal.com/sv/gather/${gatherId} ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
-        }
-        return `${userData.username} ${gatherResult}, ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
-    } catch (error) {
-        console.log(error);
-    }
+    previousGathers = list;
 }
 
 async function addChannel(channel) {
@@ -342,12 +197,10 @@ async function sendMessage(client, channel, message) {
 async function isStreamOnline(channel) {
     const {data: streamData, errorMessage: message} = await request.getData(request.RequestType.StreamStatus, channel);
     if (message) {
-        //console.log(`[BotUtils.isStreamOnline], channel: ${channel} - `, `${message}`);
         return false;
     }
-    //user_id is the name appearntly for streamstatus, but id for twitchuser data
     if (streamData.data && streamData.data.length > 0) {
-        const {user_id: twitchId, login: login} = streamData.data[0];
+        const {user_id: twitchId} = streamData.data[0];
         await settings.check(twitchId);
     }
 
@@ -365,9 +218,6 @@ module.exports = {
     sendMessage,
     addChannel,
     isBotModerator,
-    showGatherLobby,
-    findChangedGames,
-    checkMatches,
-    checkGathers,
+    checkGatherList,
     checkMaintenance
 }

@@ -23,29 +23,21 @@ class Commands {
             commandFiles.forEach(file => {
                 if (!file.startsWith('_')) {
                     try {
-                        //console.log(`Loading command from file: ${file}`);
-
                         const CommandClass = require(`./commands/${file}`);
                         const commandInstance = new CommandClass();
 
                         if (typeof CommandClass === 'function') {
                             if (commandInstance.triggers && Array.isArray(commandInstance.triggers) && commandInstance.triggers.length > 0) {
-                                // If there are triggers, add both triggers and the main instance name
                                 const commandName = file.replace('.js', '').toLowerCase();
                                 this.commands[commandName] = commandInstance;
-
                                 commandInstance.triggers.forEach(trigger => {
                                     const triggerName = trigger.toLowerCase();
                                     this.commands[triggerName] = commandInstance;
                                 });
 
-                                //console.log(`Command ${commandName} loaded with triggers: ${commandInstance.triggers.join(', ')}`);
                             } else {
-                                // If no triggers, add only the main instance name
                                 const commandName = file.replace('.js', '').toLowerCase();
                                 this.commands[commandName] = commandInstance;
-
-                                //console.log(`Command ${commandName} loaded without triggers`);
                             }
                         } else {
                             console.error(`Error loading command from file ${file}: CommandClass is not a constructor.`);
@@ -55,7 +47,6 @@ class Commands {
                     }
                 }
             });
-            //console.log('Commands loaded successfully:', this.commands.size);
         } catch (error) {
             console.error('Error reading command files:', error);
         }
@@ -72,7 +63,6 @@ class Commands {
                 return { name: commandName, class: CommandClass };
             });
 
-        // Filter out commands that are marked as moderator commands
         const nonModeratorCommands = commands.filter(command => {
             const instance = new command.class();
             return !instance.moderator;
@@ -119,10 +109,10 @@ class Commands {
         if (!twitch.data || twitch.data.length === 0) {
             return `Something went from getting this twitch, no data`;
         }
-        const {id: id, login: login, display_name: username} = twitch.data[0];
-        await this.settings.check(id);
+        const {id: twitchId} = twitch.data[0];
+        await this.settings.check(twitchId);
         const commandName = commandInstance.name;
-        return commandName && (this.settings.savedSettings[id].toggled.includes(commandName.toLowerCase()) || this.settings.savedSettings[id].toggled.includes(`!${commandName.toLowerCase()}`));
+        return commandName && (this.settings.savedSettings[twitchId].toggled.includes(commandName.toLowerCase()) || this.settings.savedSettings[twitchId].toggled.includes(`!${commandName.toLowerCase()}`));
     }
 
     isModeratorCommand(commandInstance) {

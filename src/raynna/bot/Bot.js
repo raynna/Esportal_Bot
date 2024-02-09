@@ -5,10 +5,12 @@ const tmi = require("tmi.js");
 const Commands = require('./command/Commands');
 const commands = new Commands();
 
-const { isBotModerator } = require('./utils/BotUtils');
+const { isBotModerator, TestCheck} = require('./utils/BotUtils');
 
 const { updateChannels, connectedChannels } = require('./channels/Channels');
-const { sendMessage, addChannel, checkMatches, checkGathers, checkMaintenance } = require('./utils/BotUtils');
+const { sendMessage, checkGatherList, checkMaintenance } = require('./utils/BotUtils');
+
+const { showRequests } = require('./requests/Request');
 
 const client = new tmi.Client({
     connection: {
@@ -23,7 +25,6 @@ const client = new tmi.Client({
 console.log("Connecting..");
 client.connect().then(() =>  {
     console.log(`Connected!`);
-    //console.log(`${process.env.TWITCH_BOT_USERNAME} is now connected!`);
 }).catch((error) => {
     console.error(error);
 });
@@ -31,35 +32,27 @@ client.connect().then(() =>  {
 const updateInterval = 30 * 1000; // 30 seconds
 setInterval(() => {
     updateChannels(client).then(r => {
-        //console.log('Updated channels!');
+        showRequests();
     });
 }, updateInterval);
-
 
 const maintenanceInterval = 60 * 1000;
 setInterval(() => {
     checkMaintenance(client, connectedChannels).then( async() => {
-
     });
 }, maintenanceInterval);
 
-const gatherInterval = 15 * 1000;
+const gathersInterval = 15 * 1000;
 setInterval(() => {
-    checkGathers(client, connectedChannels).then( async() => {
-
-    });
-}, gatherInterval);
-const matchInterval = 15 * 1000;
-setInterval(() => {
-    checkMatches(client, connectedChannels).then( async() => {
-
-    });
-}, matchInterval);
+    checkGatherList(client, connectedChannels).then(r => {
+        });
+}, gathersInterval);
 
 client.on('connected', (address, port) =>  {
     try {
         setTimeout(() => {
             updateChannels(client).then(async r => {
+                showRequests();
                 //await addChannel("raynnacs");
                 /*if (!settings.saveSettings.hasOwnProperty("#raynnacs")) {
                     const requestType = RequestType.TwitchUser;

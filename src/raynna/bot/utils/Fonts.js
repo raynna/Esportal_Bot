@@ -72,7 +72,7 @@ async function getFontStyle(channel, settings) {
             return error;
         }
         if (!twitch.data || twitch.data.length === 0) {
-            return `Something went from getting this twitch, no data`;
+            return fontStyles['bold'];
         }
         const {id: id, login: login, display_name: username} = twitch.data[0];
         await settings.check(id);

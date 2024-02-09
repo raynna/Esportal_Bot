@@ -1,5 +1,7 @@
 const axios = require('axios');
 
+const { info } = require('../log/Logger');
+
 const Headers = {
     TWITCH_HEADER: {
         'Client-ID': process.env.TWITCH_CLIENT_ID,
@@ -13,10 +15,10 @@ const RequestType = {
         errors: {
             badRequest: '',
         },
-        link: 'https://esportal.com/api/matchmaking/maintenance_mode_cs2'
+        link: 'https://esportal.com/api/matchmaking/_=0&maintenance_mode_cs2?_=0'
     },
     StreamStatus: {
-        name: 'Steam Status Data',
+        name: 'Twitch Status Data',
         requiredHeader: Headers.TWITCH_HEADER,
         errors: {
             notFound: 'Twitch channel does not exist',
@@ -26,7 +28,7 @@ const RequestType = {
         values: ['{channel}']
     },
     TwitchUser: {
-        name: 'Twitch User Data',
+        name: 'Twitch User',
         requiredHeader: Headers.TWITCH_HEADER,
         errors: {
             notFound: 'Twitch channel does not exist'
@@ -49,7 +51,7 @@ const RequestType = {
             notFound: 'This player does not exist on Esportal.',
             webisteDown: 'Esportal seems to be offline for the moment.'
         },
-        link: 'https://api.esportal.com/user_profile/get?username={name}&bans=1&current_match=1&team=1',
+        link: 'https://api.esportal.com/user_profile/get?_=0&username={name}&bans=1&current_match=1&team=1',
         values: ['{name}']
     },
     GatherData: {
@@ -57,7 +59,7 @@ const RequestType = {
         errors: {
             notFound: 'This gather does not exist on Esportal'
         },
-        link: 'https://api.esportal.com/gather/get?id={gatherId}',
+        link: 'https://api.esportal.com/gather/get?_=0&id={gatherId}',
         values: ['{gatherId}'],
     },
     FaceItData: {
@@ -94,11 +96,11 @@ const RequestType = {
     },
     MapData: {
         name: 'Map Data',
-        link: 'https://esportal.com/api/maps'
+        link: 'https://esportal.com/api/maps?_=0'
     },
     GatherList: {
         name: 'Gather List',
-        link: 'https://esportal.com/api/gather/list?_=0&region_id=0&subregion_id=0'
+        link: 'https://esportal.com/api/gather/list?_=0&region_id=0&subregion_id=0',
     }
 };
 
@@ -110,17 +112,47 @@ const RequestType = {
  * @param args
  * @returns {Promise<{data: null, errorMessage}|{data: null, errorMessage: (string|*)}|*|{data: null, errorMessage: string}>}
  */
+
+let REQUEST_COUNTER = {};
+let PREVIOUS_REQUEST_COUNTER = {};
+
+function addRequests(requestType) {
+    const name = requestType.name; // Assuming the type property holds the identifier for the request type
+    if (!REQUEST_COUNTER[name]) {
+        REQUEST_COUNTER[name] = 1;
+    } else {
+        REQUEST_COUNTER[name]++;
+    }
+}
+
+function showRequests() {
+    const result = Object.keys(REQUEST_COUNTER).map(name => {
+        const count = REQUEST_COUNTER[name];
+        const previousCount = PREVIOUS_REQUEST_COUNTER[name] || 0;
+        const change = count - previousCount;
+
+        return `${name}: ${count}${change !== 0 ? `(${change > 0 ? `+${change}` : change})` : ''}`;
+    }).join(', ');
+    PREVIOUS_REQUEST_COUNTER = { ...REQUEST_COUNTER };
+    info("TOTAL REQUESTS", result);
+}
+
+
 async function getData(requestType, ...args) {
-        let url = requestType.link;
-        for (const [index, value] of args.entries()) {
-            url = url.replace(requestType.values[index], typeof value === 'string' ? value.toLowerCase() : value);
-        }
-        const headers = requestType.requiredHeader || {};
-        const config = {
-            headers: headers
-        };
+    let url = requestType.link;
+    if (url.includes('_=0')) {
+        const currentDate = Date.now(); // Get current date in 'YYYY-MM-DD' format
+        url.replace('_=0', currentDate);
+    }
+    for (const [index, value] of args.entries()) {
+        url = url.replace(requestType.values[index], typeof value === 'string' ? value.toLowerCase() : value);
+    }
+    const headers = requestType.requiredHeader || {};
+    const config = {
+        headers: headers,
+    };
     try {
-    //console.log(`url: ${url}, values: ${args}`)
+        addRequests(requestType);
         return await handleRequest(async () => {
             const response = await axios.get(url, config);
             return {data: response.data, errorMessage: null};
@@ -144,15 +176,15 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-            await delay(1000 * attempt);
+            //await delay(1000 * attempt);
             return await requestFunction(additionalParams);
         } catch (error) {
             if (error.response && error.response.status === 429) {
-                const retryAfter = error.response.headers['retry-after'] || 2;
-                //console.log("error status: 429, waiting: " + retryAfter * 1000);
+                const retryAfter = error.response.headers['x-rate-limit-duration'] || 2;
+                console.log("error status: 429, waiting: " + retryAfter * 1000);
                 await delay(retryAfter * 1000);
             } else if (error.code === 'ECONNABORTED') {
-                return { data: null, errorMessage: `Request Timeout: ${error.message}`};
+                return {data: null, errorMessage: `Request Timeout: ${error.message}`};
             } else {
                 await delay(2 ** attempt * 1000);
             }
@@ -212,4 +244,4 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
     }
 }
 
-module.exports = {RequestType, getData};
+module.exports = {RequestType, getData, showRequests};
