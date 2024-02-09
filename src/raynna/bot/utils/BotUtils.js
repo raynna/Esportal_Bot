@@ -46,8 +46,15 @@ function findChangedList(previous, current) {
     try {
         const changedId = current.filter((gather) => !previous.some((previousGather) => previousGather.id === gather.id));
         const changedPlayers = current.filter((gather) => !previous.some((previousGather) => arraysEqual(previousGather.players, gather.players)));
-
         return [...new Set(changedId.concat(changedPlayers))];
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+function findChangedMatch(previous, current) {
+    try {
+        return current.filter((gather) => !previous.some((previousGather) => previousGather.active === gather.active));
     } catch (error) {
         console.log(error);
     }
@@ -61,6 +68,43 @@ function arraysEqual(arr1, arr2) {
     return true;
 }
 
+async function checkMatches(client, connectedChannels, changedMatches) {
+    let streamers = [];
+    for (const match of changedMatches) {
+        for (const playerId of match.players) {
+            const entry = Object.values(settings.savedSettings).find(entry => entry && entry.esportal && entry.esportal.id === playerId);
+            if (entry) {
+                const isConnected = Object.values(connectedChannels).find(channel => entry && entry.twitch && entry.twitch.channel === channel)
+                if (isConnected) {
+                    streamers.push(entry);
+                }
+            }
+        }
+    }
+    if (streamers.length > 0) {
+        for (const entries of streamers) {
+            const channel = entries.twitch.channel;
+            const userId = entries.esportal.id;
+
+            const gather = Object.values(changedMatches).find(entry => entry.players.includes(userId));
+            if (!gather) {
+                continue;
+            }
+            const username = entries.esportal.name;
+            const {map_id, average_elo, active, team1_score, team2_score, completed, canceled} = gather;
+            const mapName = await getMapName(map_id);
+            let result = `${username} started a match: ${mapName}, Average elo: ${average_elo}`;
+            if (canceled) {
+                result = `${username}'s match was canceled.`;
+            } else if (completed) {
+                result = `${username} finished a match: ${mapName}, Score: ${team1_score} : ${team2_score}`;
+            }
+            await sendMessage(client, channel, result);
+
+        }
+    }
+}
+
 async function checkGatherList(client, connectedChannels) {
     try {
         settings.savedSettings = await settings.loadSettings();
@@ -70,6 +114,10 @@ async function checkGatherList(client, connectedChannels) {
         }
         let streamers = [];
         if (previousGathers) {
+            const changedMatches = findChangedMatch(previousGathers, list);
+            if (changedMatches.length > 0) {
+                await checkMatches(client, connectedChannels, changedMatches);
+            }
             const changedList = findChangedList(previousGathers, list);
             if (changedList.length > 0) {
                 const result = Object.keys(changedList).map(index => {
@@ -77,9 +125,13 @@ async function checkGatherList(client, connectedChannels) {
                     const players = changedList[index].players.length;
                     return `${name} (${players})`;
                 }).join(', ');
-                info("GATHERLIST CHANGE", `${changedList.length} changed gathers: ${result}`)
+                //info("GATHERLIST CHANGE", `${changedList.length} changed gathers: ${result}`)
+
                 for (const gather of changedList) {
-                    const {players} = gather;
+                    const {players, active} = gather;
+                    if (active) {
+                        continue;
+                    }
                     for (const playerId of players) {
                         const entry = Object.values(settings.savedSettings).find(entry => entry && entry.esportal && entry.esportal.id === playerId);
                         if (entry) {

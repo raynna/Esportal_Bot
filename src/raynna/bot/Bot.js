@@ -36,7 +36,7 @@ setInterval(() => {
     });
 }, updateInterval);
 
-const maintenanceInterval = 60 * 1000;
+const maintenanceInterval = 120 * 1000;
 setInterval(() => {
     checkMaintenance(client, connectedChannels).then( async() => {
     });
@@ -118,6 +118,20 @@ client.on('message', async (channel, tags, message, self) => {
                 messageCounts[tags.username] = 1;
             } else {
                 messageCounts[tags.username]++;
+            }
+            if (message.toLowerCase().startsWith("stopbot")) {
+                if (tags.username.toLowerCase() !== process.env.CREATOR_CHANNEL.toLowerCase()) {
+                    return;
+                }
+                const reason = message.slice("stopbot".length).trim() || "No reason";
+
+                for (const connected of connectedChannels) {
+                    await sendMessage(client, connected, `Bot was force closed by ${tags.username}. Reason: ${reason}`);
+                }
+
+                await client.disconnect();
+                process.exit(0);
+                return;
             }
             const match = message.match(regexpCommand);
             if (match) {
