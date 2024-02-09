@@ -185,9 +185,9 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
                 await delay(retryAfter * 1000);
             } else if (error.code === 'ECONNABORTED') {
                 return {data: null, errorMessage: `Request Timeout: ${error.message}`};
-            } else {
+            } /*else {
                 await delay(2 ** attempt * 1000);
-            }
+            }*/
             if (attempt === maxRetries) {
                 if (error.response) {
                     switch (error.response.status) {

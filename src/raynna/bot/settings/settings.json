@@ -55,7 +55,8 @@
       "id": 889046928,
       "name": "HeatoN"
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   },
   "47536262": {
     "twitch": {
@@ -144,7 +145,8 @@
       "name": "",
       "id": -1
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   },
   "100218841": {
     "twitch": {
@@ -238,7 +240,8 @@
       "name": "",
       "id": -1
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   },
   "151262560": {
     "twitch": {

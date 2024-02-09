@@ -30,7 +30,7 @@ async function getDefault(channel, argument, settings) {
             }
             const {id: twitchId} = twitch.data[0];
             await settings.check(twitchId);
-            name = await settings.check(twitchId);
+            name = await settings.getEsportalName(twitchId);
         }
         if (!name) {
             return {
@@ -46,8 +46,15 @@ async function getDefault(channel, argument, settings) {
 
 async function getDefaultWithGameType(channel, argument, settings) {
     try {
-        let name = argument;
+        let name = argument ? argument : "";
         let gameType = 2;
+        const argumentParts = argument ? argument.split(' ') : [];
+        if (argumentParts.includes('csgo')) {
+            gameType = 0;
+            const nameIndex = argumentParts.indexOf('csgo');
+            argumentParts.splice(nameIndex, 1);
+            name = argumentParts.join(' ');
+        }
         if (!name) {
             const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
             const {data: twitch, errorMessage: message} = await getData(RequestType.TwitchUser, channelWithoutHash);
@@ -56,14 +63,7 @@ async function getDefaultWithGameType(channel, argument, settings) {
             }
             const {id: twitchId} = twitch.data[0];
             await settings.check(twitchId);
-            const argumentParts = argument ? argument.split(' ') : [];
-            if (argumentParts.includes('csgo')) {
-                gameType = 0;
-                const nameIndex = argumentParts.indexOf('csgo');
-                argumentParts.splice(nameIndex, 1);
-            }
-            const playerName = argumentParts.join(' ');
-            name = playerName || await settings.getEsportalName(twitchId);
+            name = await settings.getEsportalName(twitchId);
         }
         if (!name) {
             return {
