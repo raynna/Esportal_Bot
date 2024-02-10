@@ -54,7 +54,12 @@ function findChangedList(previous, current) {
 
 function findChangedMatch(previous, current) {
     try {
-        return current.filter((gather) => !previous.some((previousGather) => previousGather.active === gather.active));
+        return current.filter((currentMatch) => {
+            const previousMatch = previous.find((prevMatch) => prevMatch.id === currentMatch.id);
+
+            // Check if the previous match exists and has a different 'active' status
+            return previousMatch && previousMatch.active !== currentMatch.active;
+        });
     } catch (error) {
         console.log(error);
     }
@@ -71,6 +76,7 @@ function arraysEqual(arr1, arr2) {
 async function checkMatches(client, connectedChannels, changedMatches) {
     let streamers = [];
     for (const match of changedMatches) {
+        console.log(`match: ${match.name} has changed to active: ${match.active}`);
         for (const playerId of match.players) {
             const entry = Object.values(settings.savedSettings).find(entry => entry && entry.esportal && entry.esportal.id === playerId);
             if (entry) {
@@ -88,16 +94,35 @@ async function checkMatches(client, connectedChannels, changedMatches) {
 
             const gather = Object.values(changedMatches).find(entry => entry.players.includes(userId));
             if (!gather) {
+                console.log(`${channel} : couldn't find gather for player`);
+                continue;
+            }
+            const matchId = gather.match_id;
+            const { data: match, errorMessage: matchError } = await getData(RequestType.MatchData, matchId);
+            if (matchError) {
+                console.log(`${gather.name} : ${matchError}`);
                 continue;
             }
             const username = entries.esportal.name;
-            const {map_id, average_elo, active, team1_score, team2_score, completed, canceled} = gather;
+            const { team1_score, team2_score, players, map_id, team1_avg_elo, team2_avg_elo} = match;
+            let player = players.find(player => player.username.toLowerCase() === username.toLowerCase());
+            const mvp = players.reduce((prev, current) => (prev.kills > current.kills) ? prev : current);
+            const {kills, deaths, assists, headshots} = player;
+            const streamersTeam = player ? player.team : 'N/A';
+            const won = streamersTeam === 1 ? team1_score > team2_score : team2_score > team1_score;
+            const averageElo = streamersTeam === 1 ? `${username}'s team avg elo: ${team1_avg_elo} : Other team's avg elo: ${team2_avg_elo}` : `${username}'s team avg elo: ${team2_avg_elo} : Other team's avg elo: ${team1_avg_elo}`;
+            const displayScore = streamersTeam === 1 ? `${team1_score} : ${team2_score}` : `${team2_score} : ${team1_score}`;
+            const matchResult = won ? "WON" : "LOST";
+            const ratio = deaths !== 0 ? (kills / deaths).toFixed(2) : "N/A";
+            const hsRatio = headshots !== 0 ? Math.floor(headshots / kills * 100).toFixed(0) : "0";
             const mapName = await getMapName(map_id);
-            let result = `${username} started a match: ${mapName}, Average elo: ${average_elo}`;
+
+            const {completed, canceled} = gather;
+            let result = `${username} started a match: ${mapName}, ${averageElo}`;
             if (canceled) {
-                result = `${username}'s match was canceled.`;
+                result = `${username}'s ${mapName} match was canceled.`;
             } else if (completed) {
-                result = `${username} finished a match: ${mapName}, Score: ${team1_score} : ${team2_score}`;
+                result = `${username} just ${matchResult} a match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsRatio}%, K/D: ${ratio}, MVP: ${mvp.username}`;
             }
             await sendMessage(client, channel, result);
 
