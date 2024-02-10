@@ -3,6 +3,7 @@ const Settings = require('../../settings/Settings');
 const {getData, RequestType} = require('../../requests/Request');
 
 const { getGamesData } = require("../../utils/GamesUtils");
+const {checkBannedPlayer} = require("../CommandUtils");
 
 class Today {
     constructor() {
@@ -11,7 +12,7 @@ class Today {
         this.settings = new Settings();
     }
 
-    async execute(tags, channel, argument, client) {
+    async execute(tags, channel, argument, client, isBotModerator) {
         try {
             const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
             const { data: twitch, errorMessage: twitchError } = await getData(RequestType.TwitchUser, channelWithoutHash);
@@ -28,16 +29,10 @@ class Today {
             if (error) {
                 return error;
             }
-            const { id: esportalId, username: esportalName, banned: banned, ban: ban } = userData;
-
-            if (banned === true) {
-                let reason = 'None';
-                if (ban !== null) {
-                    reason = ban.reason;
-                }
-                if (reason !== `Chat abuse`) {
-                    return `${esportalName} is banned from playing Esportal. -> Reason: ${reason}!`;
-                }
+            const { id: esportalId, username: esportalName } = userData;
+            const isBanned = await checkBannedPlayer(userData, isBotModerator);
+            if (isBanned) {
+                return isBanned;
             }
             const gamesData = await getGamesData(esportalId, "daily");
 
@@ -66,8 +61,7 @@ class Today {
             const totalEloChange = eloChanges.reduce((sum, eloChange) => sum + eloChange, 0);
             return `${esportalName}'s stats today: Games: ${totalGames}, Rating: ${totalEloChange > 0 ? '+' : ''}${totalEloChange}, Kills: ${totalKills}, Deaths: ${totalDeaths}, K/D: ${ratio}`;
         } catch (error) {
-            console.error('Error on EsportalName Command:', error);
-            return 'An error occurred while registering Esportal Name.';
+            console.log(`An error has occured while executing command ${this.name}`);
         }
     }
 }

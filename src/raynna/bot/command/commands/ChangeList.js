@@ -10,7 +10,7 @@ class ChangeList {
         this.name = 'Changelist';
     }
 
-    async execute(tags, channel, argument, client) {
+    async execute(tags, channel, argument, client, isBotModerator) {
         try {
             let name = argument ? argument.trim() : "";
             if (!name) {
@@ -28,8 +28,7 @@ class ChangeList {
             await updateChannels(client);
             return result;
         } catch (error) {
-            console.error('Error on ChangeList:', error);
-            return 'Error: ChangeList.';
+            console.log(`An error has occured while executing command ${this.name}`);
         }
     }
 }

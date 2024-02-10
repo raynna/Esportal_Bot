@@ -3,6 +3,7 @@ const Settings = require('../../settings/Settings');
 const {getData, RequestType} = require('../../requests/Request');
 
 const { getGamesData } = require("../../utils/GamesUtils");
+const {checkBannedPlayer} = require("../CommandUtils");
 
 class Month {
     constructor() {
@@ -11,7 +12,7 @@ class Month {
         this.settings = new Settings();
     }
 
-    async execute(tags, channel, argument, client) {
+    async execute(tags, channel, argument, client, isBotModerator) {
         return `This command is currently disabled`;
         try {
             const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
@@ -29,16 +30,10 @@ class Month {
             if (error) {
                 return error;
             }
-            const { id: esportalId, username: esportalName, banned: banned, ban: ban } = userData;
-
-            if (banned === true) {
-                let reason = 'None';
-                if (ban !== null) {
-                    reason = ban.reason;
-                }
-                if (reason !== `Chat abuse`) {
-                    return `${esportalName} is banned from playing Esportal. -> Reason: ${reason}!`;
-                }
+            const { id: esportalId, username: esportalName } = userData;
+            const isBanned = await checkBannedPlayer(userData, isBotModerator);
+            if (isBanned) {
+                return isBanned;
             }
             const gamesData = await getGamesData(esportalId, "monthly");
 
@@ -67,8 +62,7 @@ class Month {
             const totalEloChange = eloChanges.reduce((sum, eloChange) => sum + eloChange, 0);
             return `${esportalName}'s stats latest 30 days: Games: ${totalGames}, Rating: ${totalEloChange > 0 ? '+' : ''}${totalEloChange}, Kills: ${totalKills}, Deaths: ${totalDeaths}, K/D: ${ratio}`;
         } catch (error) {
-            console.error('Error on EsportalName Command:', error);
-            return 'An error occurred while registering Esportal Name.';
+            console.log(`An error has occured while executing command ${this.name}`);
         }
     }
 }

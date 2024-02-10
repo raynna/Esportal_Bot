@@ -1,7 +1,6 @@
 const {getData, RequestType} = require("../../requests/Request");
 const Settings = require("../../settings/Settings");
 const { getDefault, checkBannedFaceit} = require('../CommandUtils');
-const {isBotModerator} = require("../../utils/BotUtils");
 const { COUNTRY_CODES } = require('../../utils/CountryUtils');
 
 class Faceit {
@@ -11,7 +10,7 @@ class Faceit {
         this.settings = new Settings();
     }
 
-    async execute(tags, channel, argument, client) {
+    async execute(tags, channel, argument, client, isBotModerator) {
         try {
             const { DefaultName: name,  Message: message} = await getDefault(channel, argument, this.settings);
             if (message) {
@@ -34,33 +33,32 @@ class Faceit {
             const faceit = faceitData.payload;
             const { nickname, games, country } = faceit;
             const { faceit_elo, skill_level } = games.cs2;
-            const isMod = await isBotModerator(client, channel);
-            const isBanned = await checkBannedFaceit(faceit, username, isMod);
+            const isBanned = await checkBannedFaceit(faceit, username, isBotModerator);
             if (isBanned) {
                 return isBanned;
             }
             let response = '';
             if (!games) {
                 response = `${username}'s Faceit: ${nickname} hasn't registered any games on Faceit.`;
-                if (isMod) {
+                if (isBotModerator) {
                     response += ` https://www.faceit.com/sv/players/${nickname}`;
                 }
                 return response;
             }
             if (!games.cs2) {
                 response = `${username}'s Faceit: ${nickname} hasn't played any Counter-Strike 2 on Faceit.`;
-                if (isMod) {
+                if (isBotModerator) {
                     response += ` https://www.faceit.com/sv/players/${nickname}`;
                 }
                 return response;
             }
             response = `${username}'s Faceit: ${nickname}, Elo: ${faceit_elo}, Level: ${skill_level}, Country: ${COUNTRY_CODES[country] || 'Unknown'}`;
-            if (isMod) {
+            if (isBotModerator) {
                 response += ` https://www.faceit.com/sv/players/${nickname}`;
             }
             return response;
         } catch (error) {
-            console.error("An error has occured while executing command Faceit");
+            console.log(`An error has occured while executing command ${this.name}`);
         }
     }
 }

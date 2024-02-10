@@ -18,6 +18,9 @@ const RequestType = {
         },
         link: 'https://esportal.com/api/matchmaking/_=0&maintenance_mode_cs2?_=0'
     },
+    News: {
+        link: 'https://esportal.com/api/news/latest?_=1706788049251&language=sv&limit=13&offset=0&region_id=0&subregion_id=0&country_id=210&show_18plus=true'
+    },
     StreamStatus: {
         name: 'Twitch Status Data',
         requiredHeader: Headers.TWITCH_HEADER,

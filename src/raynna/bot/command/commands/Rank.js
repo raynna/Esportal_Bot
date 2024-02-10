@@ -11,7 +11,7 @@ class Rank {
         this.settings = new Settings();
     }
 
-    async execute(tags, channel, argument, client) {
+    async execute(tags, channel, argument, client, isBotModerator) {
         try {
             const { DefaultName: name, GameType: gameType, Message: message} = await getDefaultWithGameType(channel, argument, this.settings);
             if (message) {
@@ -21,7 +21,7 @@ class Rank {
             if (userError) {
                 return userError;
             }
-            const isBanned = await checkBannedPlayer(userData);
+            const isBanned = await checkBannedPlayer(userData, isBotModerator);
             if (isBanned) {
                 return isBanned;
             }

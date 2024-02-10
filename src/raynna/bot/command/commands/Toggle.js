@@ -9,7 +9,7 @@ class Toggle {
         this.settings = new Settings();
     }
 
-    async execute(tags, channel, argument, client) {
+    async execute(tags, channel, argument, client, isBotModerator) {
         try {
             const command = argument ? argument.toLowerCase().trim() : "";
             const validCommands = this.commands.getValidCommands();
@@ -46,8 +46,7 @@ class Toggle {
             }
             return `Couldn't find any command with trigger ${command}.`;
         } catch (error) {
-            console.error('Error on toggle:', error);
-            return 'An error occured while executing command toggle.';
+            console.log(`An error has occured while executing command ${this.name}`);
         }
     }
 }

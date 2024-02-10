@@ -1,19 +1,24 @@
 const {getData, RequestType} = require("../requests/Request");
 
 
-async function checkBannedPlayer(userData) {
+async function checkBannedPlayer(userData, isModerator) {
     try {
         const {username: esportalName, banned: banned, ban: ban} = userData;
+        let response = null;
         if (banned === true) {
             let reason = 'None';
             if (ban !== null) {
                 reason = ban.reason;
             }
             if (reason !== `Chat abuse`) {
-                return `${esportalName} is banned from playing Esportal. -> Reason: ${reason}!`;
+                response = `${esportalName} is banned from playing Esportal. -> Reason: ${reason}!`
+                if (isModerator) {
+                    response += ` https://esportal.com/sv/profile/${esportalName}`;
+                }
+                return response;
             }
         }
-        return null;
+        return response;
     } catch (error) {
         console.error(error);
     }

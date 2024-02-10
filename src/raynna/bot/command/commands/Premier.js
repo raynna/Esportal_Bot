@@ -9,7 +9,7 @@ class Premier {
         this.settings = new Settings();
     }
 
-    async execute(tags, channel, argument, client) {
+    async execute(tags, channel, argument, client, isBotModerator) {
         try {
             const { DefaultName: name, Message: message} = await getDefault(channel, argument, this.settings);
             if (message) {
@@ -40,7 +40,7 @@ class Premier {
             }
             return `${username}'s Premier: Rating: ${skillLevel.toLocaleString()}`;
         } catch (error) {
-            console.error("An error has occured while executing command Premier");
+            console.error(`An error has occured while executing command ${this.name}`);
         }
     }
 }

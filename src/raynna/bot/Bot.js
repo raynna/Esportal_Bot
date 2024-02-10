@@ -152,9 +152,6 @@ client.on('message', async (channel, tags, message, self) => {
                         }
                         cooldowns[tags.username][channel] = currentTime;
                         const playerIsMod = tags.mod
-                        const isModerator = await client.isMod(channel, process.env.TWITCH_BOT_USERNAME);
-                        /*if (!isModerator)
-                            return;*/
                         const isStreamer = channel.slice(1).toLowerCase() === tags.username.toLowerCase();
                         if (commands.isModeratorCommand(commandInstance)) {
                             const playerIsMod = tags.mod;
@@ -166,7 +163,7 @@ client.on('message', async (channel, tags, message, self) => {
                             }
                         }
                         console.log(`[Channel: ${channel}]`, `${playerIsMod ? `[Mod: ` : isStreamer ? `[Streamer: ` : `[Viewer: `}${tags.username}] has used the command: ${message}`);
-                        let result = await commandInstance.execute(tags, channel, argument, client);
+                        let result = await commandInstance.execute(tags, channel, argument, client, await isBotModerator(client, channel));
                         if (result) {
                             result += ` @${tags.username}`;
                             await sendMessage(client, channel, result);

@@ -10,7 +10,7 @@ class EsportalName {
         this.settings = new Settings();
     }
 
-    async execute(tags, channel, argument, client) {
+    async execute(tags, channel, argument, client, isBotModerator) {
         try {
             const name = argument ? argument.trim() : "";
             if (!name) {
@@ -45,8 +45,7 @@ class EsportalName {
             await this.settings.saveEsportal(twitchId, esportalName, esportalId);
             return `Registered/updated Esportal Name: ${esportalName} for channel ${channel}`;
         } catch (error) {
-            console.error('Error on EsportalName Command:', error);
-            return 'An error occurred while registering Esportal Name.';
+            console.log(`An error has occured while executing command ${this.name}`);
         }
     }
 }

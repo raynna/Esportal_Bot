@@ -1,12 +1,12 @@
 const {getData, RequestType} = require("../../requests/Request");
 const Settings = require("../../settings/Settings");
-const { calculateRankAndPlacement } = require('../../utils/RankUtils');
 const { checkBannedPlayer, getDefaultWithGameType} = require('../CommandUtils');
 
-class Stats {
+class Default {
 
     constructor() {
-        this.name = 'Stats';
+        this.moderator = true;
+        this.name = 'Default';
         this.settings = new Settings();
     }
 
@@ -24,24 +24,13 @@ class Stats {
             if (isBanned) {
                 return isBanned;
             }
-            const { username, game_stats } = userData;
-            const gameStats = game_stats[gameType];
-            const { extra, kills, deaths, wins, losses, } = gameStats;
-            const { entry_attempts, entry_kills } = extra;
+            const { username, id, game_stats } = userData;
 
-            const gamesPlayed = wins + losses;
-
-            const entryRatio = entry_attempts !== 0 ? ((entry_kills / entry_attempts) * 100).toFixed(2) : 0;
-            const ratio = deaths !== 0 ? (kills / deaths).toFixed(2) : "N/A";
-
-            const gameTypeName = gameType === 0 ? 'CS:GO' : 'CS2';
-            const { rank } = calculateRankAndPlacement(userData, gameType);
-
-            return `${username}'s stats for ${gameTypeName}, Rank: ${rank}, Games Played: ${gamesPlayed}, K/D: ${ratio}, Entry frags: ${entry_kills} (${entryRatio}%)`;
+            return ``;
         } catch (error) {
             console.log(`An error has occured while executing command ${this.name}`);
         }
     }
 }
 
-module.exports = Stats;
+module.exports = Default;
