@@ -126,6 +126,18 @@
     },
     "toggled": []
   },
+  "75698383": {
+    "twitch": {
+      "channel": "waadtv",
+      "username": "WAadTV"
+    },
+    "esportal": {
+      "id": 94653769,
+      "name": "WAad"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
   "76070637": {
     "twitch": {
       "channel": "hyperionflip",

@@ -153,8 +153,8 @@ client.on('message', async (channel, tags, message, self) => {
                         cooldowns[tags.username][channel] = currentTime;
                         const playerIsMod = tags.mod
                         const isModerator = await client.isMod(channel, process.env.TWITCH_BOT_USERNAME);
-                        if (!isModerator)
-                            return;
+                        /*if (!isModerator)
+                            return;*/
                         const isStreamer = channel.slice(1).toLowerCase() === tags.username.toLowerCase();
                         if (commands.isModeratorCommand(commandInstance)) {
                             const playerIsMod = tags.mod;

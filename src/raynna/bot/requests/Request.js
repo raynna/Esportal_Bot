@@ -1,4 +1,5 @@
 const axios = require('axios');
+const cheerio = require('cheerio');
 
 const { info } = require('../log/Logger');
 
@@ -45,6 +46,14 @@ const RequestType = {
         link: 'https://api.twitch.tv/helix/users?id={id}',
         values: ['{id}']
     },
+    Leetify: {
+        name: 'Leetify',
+        errors: {
+            notFound: `Player haven't registered their steam on Leetify`
+        },
+        link: 'https://api.leetify.com/api/profile/{steamId}',
+        values: ['{steamId}']
+    },
     UserData: {
         name: 'User Data',
         errors: {
@@ -69,6 +78,11 @@ const RequestType = {
         },
         link: 'https://api.faceit.com/users/v1/nicknames/{username}',
         values: ['{username}'],
+    },
+    FaceitFinder: {
+        name: 'Faceit Finder',
+        link: 'https://faceitfinder.com/profile/{steamId}',
+        values: [`{steamId}`]
     },
     RecentMatchData: {
         name: 'Recent Match Data',
@@ -137,6 +151,11 @@ function showRequests() {
     info("TOTAL REQUESTS", result);
 }
 
+function extractFaceitFinder(html) {
+    const $ = cheerio.load(html);
+    return $('.account-faceit-title-username').text();
+}
+
 
 async function getData(requestType, ...args) {
     let url = requestType.link;
@@ -145,7 +164,7 @@ async function getData(requestType, ...args) {
         url.replace('_=0', currentDate);
     }
     for (const [index, value] of args.entries()) {
-        url = url.replace(requestType.values[index], typeof value === 'string' ? value.toLowerCase() : value);
+        url = url.replace(requestType.values[index], typeof value === 'string' ? value : value);
     }
     const headers = requestType.requiredHeader || {};
     const config = {
@@ -155,6 +174,15 @@ async function getData(requestType, ...args) {
         addRequests(requestType);
         return await handleRequest(async () => {
             const response = await axios.get(url, config);
+            if (requestType === RequestType.FaceitFinder) {
+                console.log(`requestType: ${requestType.name}`);
+                console.log(`faceitFinder url: ${url}`);
+                const faceit = extractFaceitFinder(response.data);
+                if (!faceit) {
+                    return { data: null, errorMessage: `This player haven't played any CS2 on Faceit.`};
+                }
+                return { data: faceit, errorMessage: null };
+            }
             return {data: response.data, errorMessage: null};
         }, requestType.errors || {});
     } catch (error) {

@@ -19,6 +19,23 @@ async function checkBannedPlayer(userData) {
     }
 }
 
+async function checkBannedFaceit(faceit, esportalName, isMod) {
+    try {
+        const {registration_status, nickname} = faceit;
+        const isBanned = registration_status === 'banned';
+        let response = `${esportalName}'s Faceit: ${nickname} is banned from playing on Faceit.`;
+        if (isBanned) {
+            if (isMod) {
+                response += ` https://www.faceit.com/sv/players/${nickname}`;
+            }
+            return response;
+        }
+        return null;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 async function getDefault(channel, argument, settings) {
     try {
         let name = argument;
@@ -78,4 +95,4 @@ async function getDefaultWithGameType(channel, argument, settings) {
     }
 }
 
-module.exports = {getDefaultWithGameType, getDefault, checkBannedPlayer}
+module.exports = {getDefaultWithGameType, getDefault, checkBannedPlayer, checkBannedFaceit}
