@@ -11,6 +11,7 @@ class Toggle {
 
     async execute(tags, channel, argument, client, isBotModerator) {
         try {
+            this.settings.savedSettings = await this.settings.loadSettings();
             const command = argument ? argument.toLowerCase().trim() : "";
             const validCommands = this.commands.getValidCommands();
             const formattedList = this.commands.formatCommandList(validCommands);
@@ -25,14 +26,14 @@ class Toggle {
             const { id: twitchId } = twitch.data[0];
             await this.settings.check(twitchId);
             if (command === 'enabled') {
-                const enabled = this.settings[twitchId]?.toggled
-                    ? validCommands.filter(command => !this.settings[twitchId].toggled.includes(command))
+                const enabled = this.settings.savedSettings[twitchId]?.toggled
+                    ? validCommands.filter(command => !this.settings.savedSettings[twitchId].toggled.includes(command))
                     : validCommands;
                 const formattedList = this.commands.formatCommandList(enabled);
                 return `Enabled commands in ${channel} are: ${formattedList}`;
             }
             if (command === 'disabled') {
-                const disabled = this.settings[twitchId]?.toggled || [];
+                const disabled = this.settings.savedSettings[twitchId]?.toggled || [];
                 const formattedList = this.commands.formatCommandList(disabled);
                 return `Disabled commands in ${channel} are: ${formattedList}`;
             }

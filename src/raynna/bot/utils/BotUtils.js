@@ -110,7 +110,7 @@ async function checkMatches(client, connectedChannels, changedMatches) {
             const {kills, deaths, assists, headshots} = player;
             const streamersTeam = player ? player.team : 'N/A';
             const won = streamersTeam === 1 ? team1_score > team2_score : team2_score > team1_score;
-            const averageElo = streamersTeam === 1 ? `${username}'s team avg elo: ${team1_avg_elo} : Other team's avg elo: ${team2_avg_elo}` : `${username}'s team avg elo: ${team2_avg_elo} : Other team's avg elo: ${team1_avg_elo}`;
+            const averageElo = streamersTeam === 1 ? `${team1_avg_elo} : ${team2_avg_elo}` : `${team2_avg_elo} : ${team1_avg_elo}`;
             const displayScore = streamersTeam === 1 ? `${team1_score} : ${team2_score}` : `${team2_score} : ${team1_score}`;
             const matchResult = won ? "WON" : "LOST";
             const ratio = deaths !== 0 ? (kills / deaths).toFixed(2) : "N/A";
@@ -118,7 +118,7 @@ async function checkMatches(client, connectedChannels, changedMatches) {
             const mapName = await getMapName(map_id);
 
             const {completed, canceled} = gather;
-            let result = `${username} started a match: ${mapName}, ${averageElo}`;
+            let result = `${username} started a match: ${mapName}, Average team ratings: ${averageElo}`;
             if (canceled) {
                 result = `${username}'s ${mapName} match was canceled.`;
             } else if (completed) {

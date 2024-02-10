@@ -19,18 +19,17 @@ class Esportal {
             if (userError) {
                 return userError;
             }
-            const { username, id, game_stats } = userData;
+            const { username} = userData;
             let response = ``;
             const isBanned = await checkBannedPlayer(userData, isBotModerator);
             if (isBanned) {
                 return isBanned;
             }
             if (isBotModerator) {
-                response = `https://esportal.com/sv/profile/${userData.username}`;
+                response = `${username}'s Esportal: https://esportal.com/sv/profile/${username}`;
             } else {
-                response = `Esportal name: ${userData.username}`;
+                response = `${username}'s Esportal name: ${username}`;
             }
-            response += ` @${tags.username}`;
             return response;
         } catch (error) {
             console.log(`An error has occured while executing command ${this.name}`);

@@ -250,8 +250,8 @@
       "username": "StekeFar"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 970631758,
+      "name": "STEKEFAR"
     },
     "toggled": [],
     "font": "bold"
@@ -307,8 +307,8 @@
       "username": "KDmJ_"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 408552766,
+      "name": "KDmJ"
     },
     "toggled": [],
     "font": "bold"
@@ -322,7 +322,10 @@
       "id": 927602257,
       "name": "ChrilleEkberG"
     },
-    "toggled": [],
+    "toggled": [
+      "esportal",
+      "steam"
+    ],
     "font": "bold"
   },
   "467664914": {
@@ -331,8 +334,8 @@
       "username": "lasseman86"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 22983599,
+      "name": "LasseMan"
     },
     "toggled": [],
     "font": "bold"
@@ -346,9 +349,7 @@
       "id": 64482212,
       "name": "Raynna"
     },
-    "toggled": [
-      "today"
-    ],
+    "toggled": [],
     "font": "bold"
   },
   "505227161": {

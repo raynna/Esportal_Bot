@@ -77,8 +77,9 @@ class Commands {
     }
 
     static formatCommandList(commands) {
-        return commands.length > 0 ? commands.join(', ') : 'None';
+        return commands.length > 0 ? commands.map(command => `!${command.toLowerCase()}`).join(', ') : 'None';
     }
+
 
     static findCommandClassByTrigger(trigger, validCommands) {
         for (const command of validCommands) {
