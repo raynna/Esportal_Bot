@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const { info } = require('../log/Logger');
+const {info} = require('../log/Logger');
 
 const Headers = {
     TWITCH_HEADER: {
@@ -19,6 +19,7 @@ const RequestType = {
         link: 'https://esportal.com/api/matchmaking/_=0&maintenance_mode_cs2?_=0'
     },
     News: {
+        name: 'News',
         link: 'https://esportal.com/api/news/latest?_=1706788049251&language=sv&limit=13&offset=0&region_id=0&subregion_id=0&country_id=210&show_18plus=true'
     },
     StreamStatus: {
@@ -118,7 +119,13 @@ const RequestType = {
     GatherList: {
         name: 'Gather List',
         link: 'https://esportal.com/api/gather/list?_=0&region_id=0&subregion_id=0',
+    },
+    MatchList: {
+        name: 'Match List',
+        link: 'https://esportal.com/api/live_games/list?_=0&region_id=0&subregion_id=0',
     }
+
+    //https://esportal.com/api/live_games/list?_=1707604980631&region_id=0
 };
 
 /**
@@ -142,7 +149,7 @@ function addRequests(requestType) {
     }
 }
 
-function showRequests() {
+async function showRequests() {
     const result = Object.keys(REQUEST_COUNTER).map(name => {
         const count = REQUEST_COUNTER[name];
         const previousCount = PREVIOUS_REQUEST_COUNTER[name] || 0;
@@ -150,8 +157,8 @@ function showRequests() {
 
         return `${name}: ${count}${change !== 0 ? `(${change > 0 ? `+${change}` : change})` : ''}`;
     }).join(', ');
-    PREVIOUS_REQUEST_COUNTER = { ...REQUEST_COUNTER };
-    info("TOTAL REQUESTS", result);
+    PREVIOUS_REQUEST_COUNTER = {...REQUEST_COUNTER};
+    await info("TOTAL REQUESTS", result);
 }
 
 function extractFaceitFinder(html) {
@@ -174,7 +181,9 @@ async function getData(requestType, ...args) {
         headers: headers,
     };
     try {
-        addRequests(requestType);
+        await addRequests(requestType);
+        if (requestType === RequestType.MatchList)
+            console.log(url);
         return await handleRequest(async () => {
             const response = await axios.get(url, config);
             if (requestType === RequestType.FaceitFinder) {
@@ -182,9 +191,9 @@ async function getData(requestType, ...args) {
                 console.log(`faceitFinder url: ${url}`);
                 const faceit = extractFaceitFinder(response.data);
                 if (!faceit) {
-                    return { data: null, errorMessage: `This player haven't played any CS2 on Faceit.`};
+                    return {data: null, errorMessage: `This player haven't played any CS2 on Faceit.`};
                 }
-                return { data: faceit, errorMessage: null };
+                return {data: faceit, errorMessage: null};
             }
             return {data: response.data, errorMessage: null};
         }, requestType.errors || {});

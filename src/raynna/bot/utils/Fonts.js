@@ -82,4 +82,4 @@ async function getFontStyle(channel, settings) {
     }
 }
 
-module.exports = { getFontStyle };
+module.exports = { getFontStyle, fontStyles };

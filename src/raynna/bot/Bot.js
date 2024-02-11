@@ -5,7 +5,7 @@ const tmi = require("tmi.js");
 const Commands = require('./command/Commands');
 const commands = new Commands();
 
-const { isBotModerator, TestCheck} = require('./utils/BotUtils');
+const { isBotModerator, TestCheck, TestMatchList} = require('./utils/BotUtils');
 
 const { updateChannels, connectedChannels } = require('./channels/Channels');
 const { sendMessage, checkGatherList, checkMaintenance } = require('./utils/BotUtils');
@@ -37,15 +37,16 @@ setInterval(() => {
 }, updateInterval);
 
 const maintenanceInterval = 120 * 1000;
-setInterval(() => {
-    checkMaintenance(client, connectedChannels).then( async() => {
+setInterval(async () => {
+    await checkMaintenance(client, connectedChannels).then(r => {
     });
 }, maintenanceInterval);
 
 const gathersInterval = 15 * 1000;
-setInterval(() => {
-    checkGatherList(client, connectedChannels).then(r => {
-        });
+setInterval(async () => {
+    await checkGatherList(client, connectedChannels).then(async r => {
+        //await TestMatchList(client, connectedChannels)
+    });
 }, gathersInterval);
 
 client.on('connected', (address, port) =>  {
@@ -162,7 +163,7 @@ client.on('message', async (channel, tags, message, self) => {
                                 return;
                             }
                         }
-                        console.log(`[Channel: ${channel}]`, `${playerIsMod ? `[Mod: ` : isStreamer ? `[Streamer: ` : `[Viewer: `}${tags.username}] has used the command: ${message}`);
+                        await printInfo(client, "raynnacs", `Command execute on channel: ${channel}`,`${playerIsMod ? `Mod: ` : isStreamer ? `Streamer: ` : `Viewer: `}${tags.username} has used the command: ${message}`);
                         let result = await commandInstance.execute(tags, channel, argument, client, await isBotModerator(client, channel));
                         if (result) {
                             result += ` @${tags.username}`;
@@ -183,6 +184,7 @@ client.on('message', async (channel, tags, message, self) => {
 });
 
 const readline = require('readline');
+const {printInfo} = require("./log/Logger");
 
 process.on('SIGINT', async () => {
     let closingReason = false;

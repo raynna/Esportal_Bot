@@ -6,11 +6,10 @@ async function getGamesData(userId, duration = "daily") {
         const allMatches = await getAllMatches(userId, duration);
         const currentDate = new Date();
         const filterFunction =
-            duration === "monthly"
-                ? match => isMatchPlayedWithinMonth(match.inserted, currentDate)
-                : duration === "weekly"
-                    ? match => isMatchPlayedWithinLastWeek(match.inserted, currentDate)
-                    : match => isMatchPlayedToday(match.inserted, currentDate);
+            duration === "monthly" ? match => isMatchPlayedWithinMonth(match.inserted, currentDate) :
+                duration === "weekly" ? match => isMatchPlayedWithinLastWeek(match.inserted, currentDate) :
+                duration === "yesterday" ? match => isMatchPlayedYesterday(match.inserted, currentDate) :
+                        match => isMatchPlayedToday(match.inserted, currentDate);
 
 
         const filteredMatches = allMatches.filter(filterFunction);
@@ -60,9 +59,12 @@ async function getAllMatches(userId, duration) {
 
         const currentDate = new Date();
         const match = recentGames.data[recentGames.data.length - 1];
-        const stopCondition = duration === "monthly" ? !isMatchPlayedWithinMonth(match.inserted, currentDate) :
-            duration === "weekly" ? !isMatchPlayedWithinLastWeek(match.inserted, currentDate) :
-                !isMatchPlayedToday(match.inserted, currentDate);
+        const stopCondition =
+            duration === "monthly" ? !isMatchPlayedWithinMonth(match.inserted, currentDate) :
+                duration === "weekly" ? !isMatchPlayedWithinLastWeek(match.inserted, currentDate) :
+                    duration === "yesterday" ? !isMatchPlayedYesterday(match.inserted, currentDate) :
+
+                        !isMatchPlayedToday(match.inserted, currentDate);
         if (stopCondition) {
             break;
         }
@@ -72,6 +74,15 @@ async function getAllMatches(userId, duration) {
     return allMatches;
 }
 
+
+function isMatchPlayedYesterday(timestamp, currentDate) {
+    const matchDate = new Date(timestamp * 1000);
+    return (
+        matchDate.getUTCDate() === currentDate.getUTCDate() - 1 &&
+        matchDate.getUTCMonth() === currentDate.getUTCMonth() &&
+        matchDate.getUTCFullYear() === currentDate.getUTCFullYear()
+    );
+}
 
 function isMatchPlayedToday(timestamp, currentDate) {
     const matchDate = new Date(timestamp * 1000);
