@@ -298,10 +298,10 @@ async function TestMatchList(client, connectedChannels) {
                         continue;
                     }
                     const {team1_score, team2_score, players, map_id, team1_avg_elo, team2_avg_elo} = match;
-                    let player = players.find(player => player.username.toLowerCase() === username.toLowerCase());
+                    let streamer = players.find(player => player.username.toLowerCase() === username.toLowerCase());
                     const mvp = players.reduce((prev, current) => (prev.kills > current.kills) ? prev : current);
-                    const {kills, deaths, assists, headshots} = player;
-                    const streamersTeam = player ? player.team : 'N/A';
+                    const {kills, deaths, assists, headshots} = streamer;
+                    const streamersTeam = streamer ? streamer.team : 'N/A';
                     const won = streamersTeam === 1 ? team1_score > team2_score : team2_score > team1_score;
                     const averageElo = streamersTeam === 1 ? `${team1_avg_elo} : ${team2_avg_elo}` : `${team2_avg_elo} : ${team1_avg_elo}`;
                     const displayScore = streamersTeam === 1 ? `${team1_score} : ${team2_score}` : `${team2_score} : ${team1_score}`;
@@ -309,6 +309,22 @@ async function TestMatchList(client, connectedChannels) {
                     const ratio = deaths !== 0 ? (kills / deaths).toFixed(2) : "N/A";
                     const hsRatio = headshots !== 0 ? Math.floor(headshots / kills * 100).toFixed(0) : "0";
                     const mapName = await getMapName(map_id);
+                    let team1Kills = 0;
+                    let team1Deaths = 0;
+                    let team2Kills = 0;
+                    let team2Deaths = 0;
+                    players.forEach(player => {
+                        if (player.team === 1) {
+                            team1Kills += player.recent_kills;
+                            team1Deaths += player.recent_deaths;
+                        } else {
+                            team2Kills += player.recent_kills;
+                            team2Deaths += player.recent_deaths;
+                        }
+                    });
+                    const team1AverageKD = team1Deaths !== 0 ? (team1Kills / team1Deaths).toFixed(2) : "N/A";
+                    const team2AverageKD = team2Deaths !== 0 ? (team2Kills / team2Deaths).toFixed(2) : "N/A";
+                    const averageKD = streamersTeam === 1 ? `${team1AverageKD} : ${team2AverageKD}` : `${team2AverageKD} : ${team1AverageKD}`;
                     const {
                         data: gather,
                         errorMessage: gatherError
@@ -317,7 +333,7 @@ async function TestMatchList(client, connectedChannels) {
                         continue;
                     }
                     const {completed, canceled} = gather;
-                    let result = `${username} started a match: ${mapName}, Average team ratings: ${averageElo}`;
+                    let result = `${username} started a match: ${mapName}, Teams average ratings: ${averageElo}, Teams recent average K/D : ${averageKD}`;
                     if (completed) {
                         result = `${username} just ${matchResult} a match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsRatio}%, K/D: ${ratio}, MVP: ${mvp.username}`;
                     } else if (canceled) {
