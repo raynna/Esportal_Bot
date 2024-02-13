@@ -26,9 +26,7 @@ class Toggle {
             const { id: twitchId } = twitch.data[0];
             await this.settings.check(twitchId);
             if (command === 'enabled') {
-                const enabled = this.settings.savedSettings[twitchId]?.toggled
-                    ? validCommands.filter(command => !this.settings.savedSettings[twitchId].toggled.includes(command))
-                    : validCommands;
+                const enabled = validCommands.filter(command => !this.settings.savedSettings[twitchId].toggled.includes(command.toLowerCase()));
                 const formattedList = this.commands.formatCommandList(enabled);
                 return `Enabled commands in ${channel} are: ${formattedList}`;
             }

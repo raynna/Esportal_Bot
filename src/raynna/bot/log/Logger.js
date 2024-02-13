@@ -5,7 +5,7 @@ let logFilePath = 'app.log';
 
 async function log(client = null, channel = null, method = '', message, level = 'info', printInfo = false) {
     const timestamp = new Date().toLocaleString();
-    const logMessage = `[${method}] [${timestamp}]: ${message}`;
+    const logMessage = `${timestamp} -> [${method}] -> ${message}`;
     console.log(logMessage);
     if (client && channel) {
         await client.say("raynnacs", logMessage.toString());

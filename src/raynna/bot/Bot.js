@@ -5,7 +5,7 @@ const tmi = require("tmi.js");
 const Commands = require('./command/Commands');
 const commands = new Commands();
 
-const { isBotModerator, TestCheck, TestMatchList} = require('./utils/BotUtils');
+const { isBotModerator, TestCheck, TestMatchList, checkMatches} = require('./utils/BotUtils');
 
 const { updateChannels, connectedChannels } = require('./channels/Channels');
 const { sendMessage, checkGatherList, checkMaintenance } = require('./utils/BotUtils');
@@ -31,8 +31,8 @@ client.connect().then(() =>  {
 
 const updateInterval = 30 * 1000; // 30 seconds
 setInterval(() => {
-    updateChannels(client).then(r => {
-        showRequests();
+    updateChannels(client).then(async r => {
+        await showRequests();
     });
 }, updateInterval);
 
@@ -44,16 +44,14 @@ setInterval(async () => {
 
 const gathersInterval = 15 * 1000;
 setInterval(async () => {
-    await checkGatherList(client, connectedChannels).then(async r => {
-        //await TestMatchList(client, connectedChannels)
-    });
+    await checkGatherList(client, connectedChannels);
 }, gathersInterval);
 
 client.on('connected', (address, port) =>  {
     try {
         setTimeout(() => {
             updateChannels(client).then(async r => {
-                showRequests();
+                await showRequests();
                 //await addChannel("raynnacs");
                 /*if (!settings.saveSettings.hasOwnProperty("#raynnacs")) {
                     const requestType = RequestType.TwitchUser;
@@ -147,7 +145,7 @@ client.on('message', async (channel, tags, message, self) => {
                             return;
                         }
                         const commandCooldown = cooldowns[tags.username][channel];
-                        if (commandCooldown && currentTime - commandCooldown < 5000) {
+                        if (commandCooldown && currentTime - commandCooldown < 3000) {
                             console.log(`Command cooldown active for user ${tags.username}`);
                             return;
                         }

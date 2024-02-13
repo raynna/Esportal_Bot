@@ -17,8 +17,8 @@
       "username": "pani1337"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 24448,
+      "name": "pani"
     },
     "toggled": [],
     "font": "bold"
@@ -91,6 +91,18 @@
       "id": -1
     },
     "toggled": []
+  },
+  "61719148": {
+    "twitch": {
+      "channel": "d2robban",
+      "username": "d2robban"
+    },
+    "esportal": {
+      "id": 120204644,
+      "name": "Robban"
+    },
+    "toggled": [],
+    "font": "bold"
   },
   "62489635": {
     "twitch": {
@@ -183,14 +195,38 @@
     },
     "toggled": []
   },
+  "116027663": {
+    "twitch": {
+      "channel": "evarizta",
+      "username": "Evarizta"
+    },
+    "esportal": {
+      "id": 159121837,
+      "name": "Evarizta"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
   "126164678": {
     "twitch": {
       "channel": "emzgamez",
       "username": "EmzGamez"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 351679727,
+      "name": "EmzGamez"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "138185322": {
+    "twitch": {
+      "channel": "non1h",
+      "username": "Non1h"
+    },
+    "esportal": {
+      "id": 168903440,
+      "name": "Non1h"
     },
     "toggled": [],
     "font": "bold"
@@ -205,7 +241,14 @@
       "name": "honko"
     },
     "toggled": [
-      "rank"
+      "rank",
+      "week",
+      "news",
+      "month",
+      "yesterday",
+      "steam",
+      "esportal",
+      "premier"
     ],
     "font": "bold"
   },
@@ -275,10 +318,11 @@
       "username": "Errkkan"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 247684337,
+      "name": "Errkkan"
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   },
   "158066083": {
     "twitch": {
@@ -383,6 +427,30 @@
     "esportal": {
       "id": 450444271,
       "name": "Maluwa"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "643131218": {
+    "twitch": {
+      "channel": "melonmies",
+      "username": "MelonMies"
+    },
+    "esportal": {
+      "id": 1161229838,
+      "name": "MelonMies"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "674086738": {
+    "twitch": {
+      "channel": "n4vy__1",
+      "username": "n4vy__1"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
     },
     "toggled": [],
     "font": "bold"

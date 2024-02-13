@@ -12,6 +12,9 @@ class ChangeList {
 
     async execute(tags, channel, argument, client, isBotModerator) {
         try {
+            if (tags.username.toLowerCase() !== process.env.CREATOR_CHANNEL.toLowerCase()) {
+                return;
+            }
             let name = argument ? argument.trim() : "";
             if (!name) {
                 return await addChannel(tags.username);
