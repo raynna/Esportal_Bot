@@ -38,11 +38,14 @@ class Premier {
             if (!skillLevel) {
                 skillLevel = `---`;
             }
-            return `${username}'s Premier: Rating: ${skillLevel.toLocaleString()}`;
+            return `${username}'s Premier Rating: ${skillLevel.toLocaleString()}`;
         } catch (error) {
             console.error(`An error has occured while executing command ${this.name}`);
         }
     }
+    //custom command for nightbot
+    //!addcom !rank $(eval d=$(urlfetch json https://api.leetify.com/api/profile/DITTSTEAMID); const { games } = d; let skillLevel = games.find(game => game?.dataSource === 'matchmaking' && game.skillLevel !== null && game.skillLevel !== 0 && game.isCs2)?.skillLevel || '---'; `DITTNAMN's Premier: Rating: ${skillLevel.toLocaleString()}`)
+
 }
 
 module.exports = Premier;
