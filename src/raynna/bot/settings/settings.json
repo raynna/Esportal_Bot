@@ -92,6 +92,20 @@
     },
     "toggled": []
   },
+  "60535075": {
+    "twitch": {
+      "channel": "rekoj",
+      "username": "rekoj"
+    },
+    "esportal": {
+      "id": 56238722,
+      "name": "rekoj"
+    },
+    "toggled": [
+      "dino"
+    ],
+    "font": "bold"
+  },
   "61719148": {
     "twitch": {
       "channel": "d2robban",
@@ -137,6 +151,18 @@
       "id": -1
     },
     "toggled": []
+  },
+  "69255090": {
+    "twitch": {
+      "channel": "empantv",
+      "username": "empaNTV"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": [],
+    "font": "bold"
   },
   "75698383": {
     "twitch": {
@@ -204,7 +230,10 @@
       "id": 159121837,
       "name": "Evarizta"
     },
-    "toggled": [],
+    "toggled": [
+      "steam",
+      "esportal"
+    ],
     "font": "bold"
   },
   "126164678": {
@@ -245,6 +274,10 @@
       "week",
       "news",
       "month",
+      "gather",
+      "match",
+      "esportalbot",
+      "cmd",
       "yesterday",
       "steam",
       "esportal",
@@ -286,6 +319,20 @@
       "name": "StakarN"
     },
     "toggled": [],
+    "font": "bold"
+  },
+  "148979949": {
+    "twitch": {
+      "channel": "hjelmm",
+      "username": "Hjelmm"
+    },
+    "esportal": {
+      "id": 374632316,
+      "name": "5X5X5"
+    },
+    "toggled": [
+      "month"
+    ],
     "font": "bold"
   },
   "150145098": {
@@ -373,6 +420,20 @@
     ],
     "font": "bold"
   },
+  "460849952": {
+    "twitch": {
+      "channel": "growencs",
+      "username": "groweNcs"
+    },
+    "esportal": {
+      "id": 101587696,
+      "name": "groweN"
+    },
+    "toggled": [
+      "dino"
+    ],
+    "font": "bold"
+  },
   "467664914": {
     "twitch": {
       "channel": "lasseman86",
@@ -414,10 +475,11 @@
       "username": "Majzs"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 1092999731,
+      "name": "Majzs"
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   },
   "561066744": {
     "twitch": {
@@ -449,8 +511,8 @@
       "username": "n4vy__1"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 21678271,
+      "name": "navy"
     },
     "toggled": [],
     "font": "bold"

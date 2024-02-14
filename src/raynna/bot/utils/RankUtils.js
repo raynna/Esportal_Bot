@@ -32,7 +32,7 @@ function calculateRankAndPlacement(userData, gameType) {
     }
 
     const rank = rankNames.find(r => elo >= rankThresholds[r]) || 'Unranked';
-    const placement = "Placement: " + (gameType === 2 && leaderboard_position || 'N/A');
+    const placement = "Leaderboard placement: " + (gameType === 2 && leaderboard_position.toLocaleString() || 'N/A');
     return { rank, placement };
 }
 

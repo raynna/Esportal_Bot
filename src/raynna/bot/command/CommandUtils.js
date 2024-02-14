@@ -43,7 +43,7 @@ async function checkBannedFaceit(faceit, esportalName, isMod) {
 
 async function getDefault(channel, argument, settings) {
     try {
-        let name = argument;
+        let name = argument ? argument.trim() : "";
         if (!name) {
             const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
             const {data: twitch, errorMessage: message} = await getData(RequestType.TwitchUser, channelWithoutHash);
@@ -68,7 +68,7 @@ async function getDefault(channel, argument, settings) {
 
 async function getDefaultWithGameType(channel, argument, settings) {
     try {
-        let name = argument ? argument : "";
+        let name = argument ? argument.trim() : "";
         let gameType = 2;
         const argumentParts = argument ? argument.split(' ') : [];
         if (argumentParts.includes('csgo')) {

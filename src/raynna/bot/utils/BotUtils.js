@@ -23,6 +23,9 @@ async function checkMaintenance(client, connectedChannels) {
             return;
         }
         for (const connected of connectedChannels) {
+            if (!await isBotModerator(client, connected)) {
+                continue;
+            }
             if (!maintenanceData) {
                 if (maintenance[connected]) {
                     maintenance[connected] = false;

@@ -36,7 +36,7 @@ setInterval(() => {
     });
 }, updateInterval);
 
-const maintenanceInterval = 120 * 1000;
+const maintenanceInterval = 60 * 1000;
 setInterval(async () => {
     await checkMaintenance(client, connectedChannels).then(r => {
     });

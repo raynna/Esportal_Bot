@@ -16,7 +16,7 @@ const RequestType = {
         errors: {
             badRequest: '',
         },
-        link: 'https://esportal.com/api/matchmaking/_=0&maintenance_mode_cs2?_=0'
+        link: 'https://esportal.com/api/matchmaking/maintenance_mode_cs2'
     },
     News: {
         name: 'News',
@@ -62,6 +62,7 @@ const RequestType = {
         name: 'User Data',
         errors: {
             notFound: 'This player does not exist on Esportal.',
+            badRequest: 'This is not a valid Esportalname.',
             webisteDown: 'Esportal seems to be offline for the moment.'
         },
         link: 'https://api.esportal.com/user_profile/get?_=0&username={name}&bans=1&current_match=1&team=1',
@@ -193,7 +194,16 @@ async function getData(requestType, ...args) {
                 if (!faceit) {
                     return {data: null, errorMessage: `This player haven't played any CS2 on Faceit.`};
                 }
+                console.log(`faceName: ${faceit}`);
                 return {data: faceit, errorMessage: null};
+            }
+            if (requestType === RequestType.UserData) {
+                const username = await response.data.username;
+                if (username) {
+                    if (username.toLowerCase() === "easilyy") {
+                        return { data: null, errorMessage: requestType.errors.notFound};
+                    }
+                }
             }
             return {data: response.data, errorMessage: null};
         }, requestType.errors || {});
@@ -255,7 +265,7 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
                                 errorMessage: `Requested information to frequently, try again later.`
                             };
                         case 500:
-                            return {data: null, errorMessage: `Internal Server Error: ${error.response.status}`};
+                            return {data: null, errorMessage: ""};
                         case 502:
                             return {data: null, errorMessage: `Bad Gateway: ${error.response.status}`};
                         case 503:
