@@ -1,12 +1,31 @@
-const hearts = {
-    '🧡': '\uD83E\uDDA1',
-    '💛': '\uD83D\uDCB4',
-    '💚': '\uD83D\uDC9A',
-    '💙': '\uD83D\uDC99',
-    '❤️': '\u2764\uFE0F',
-    '💜': '\uD83D\uDC9C',
-    '🤍': '\uD83E\uDD0D',
-    '🖤': '\uD83E\uDD0D'
+const symbols = {
+    '🧡': '\uD83E\uDDA1', // Orange Heart
+    '💛': '\uD83D\uDCB4', // Yellow Heart
+    '💚': '\uD83D\uDC9A', // Green Heart
+    '💙': '\uD83D\uDC99', // Blue Heart
+    '❤️': '\u2764\uFE0F', // Red Heart
+    '💜': '\uD83D\uDC9C', // Purple Heart
+    '🤍': '\uD83E\uDD0D', // White Heart
+    '🖤': '\u2B1B',       // Black Square
+    '🟥': '\uD83D\uDFE5', // Red Square
+    '🟧': '\uD83E\uDDE7', // Orange Square
+    '🟨': '\uD83E\uDDE8', // Yellow Square
+    '🟩': '\uD83E\uDDE9', // Green Square
+    '🟦': '\uD83E\uDDE6', // Blue Square
+    '🟪': '\uD83E\uDDEA', // Purple Square
+    '⚫': '\u26AB',       // Black Circle
+    '🔴': '\uD83D\uDD34', // Red Circle
+    '🟠': '\uD83E\uDDE0', // Orange Circle
+    '🟡': '\uD83E\uDDE1', // Yellow Circle
+    '🟢': '\uD83E\uDDE2', // Green Circle
+    '🔵': '\uD83D\uDD35', // Blue Circle
+    '🟣': '\uD83E\uDDE3', // Purple Circle
+    '⬛': '\u2B1B',       // Black Large Square
+    '⬜': '\u2B1C',       // White Large Square
+    '🔶': '\uD83D\uDD36', // Large Orange Diamond
+    '🔷': '\uD83D\uDD37', // Large Blue Diamond
+    '🔳': '\u25A1',       // White Square Containing Black Small Square
+    '🔲': '\u25A0'        // Black Square Containing Black Small Square
 };
 
 const rankNames = [
