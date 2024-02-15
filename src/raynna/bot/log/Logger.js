@@ -3,32 +3,25 @@ const path = require('path');
 
 let logFilePath = 'app.log';
 
-async function log(client = null, channel = null, method = '', message, level = 'info', printInfo = false) {
+async function log(method = '', message, level = 'info') {
     const timestamp = new Date().toLocaleString();
     const logMessage = `${timestamp} -> [${method}] -> ${message}`;
     console.log(logMessage);
-    if (client && channel) {
-        await client.say("raynnacs", logMessage.toString());
-    }
     if (level === 'error' || level === 'warning') {
         writeToFile(logMessage);
     }
 }
 
 async function info(method, message,) {
-    await log(null, null, method, message, 'info');
-}
-
-async function printInfo(client, channel, method, message) {
-    await log(client, channel, method, message, 'info');
+    await log(method, message, 'info');
 }
 
 async function warn(message) {
-    await log(null, null, '', message, 'warn');
+    await log('', message, 'warn');
 }
 
 async function error(message) {
-    await log(null, null, '', message, 'error');
+    await log('', message, 'error');
 }
 
 function ensureLogFile() {
@@ -47,4 +40,4 @@ function writeToFile(logMessage) {
     });
 }
 
-module.exports = { warn, error, info, log, printInfo };
+module.exports = { warn, error, info, log };

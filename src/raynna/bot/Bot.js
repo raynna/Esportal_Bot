@@ -5,12 +5,12 @@ const tmi = require("tmi.js");
 const Commands = require('./command/Commands');
 const commands = new Commands();
 
-const { isBotModerator, TestCheck, TestMatchList, checkMatches} = require('./utils/BotUtils');
+const {isBotModerator, TestCheck, TestMatchList, checkMatches} = require('./utils/BotUtils');
 
-const { updateChannels, connectedChannels } = require('./channels/Channels');
-const { sendMessage, checkGatherList, checkMaintenance } = require('./utils/BotUtils');
+const {updateChannels, connectedChannels} = require('./channels/Channels');
+const {sendMessage, checkGatherList, checkMaintenance} = require('./utils/BotUtils');
 
-const { showRequests } = require('./requests/Request');
+const {showRequests} = require('./requests/Request');
 
 const client = new tmi.Client({
     connection: {
@@ -23,7 +23,7 @@ const client = new tmi.Client({
 });
 
 console.log("Connecting..");
-client.connect().then(() =>  {
+client.connect().then(() => {
     console.log(`Connected!`);
 }).catch((error) => {
     console.error(error);
@@ -47,7 +47,7 @@ setInterval(async () => {
     await checkGatherList(client, connectedChannels);
 }, gathersInterval);
 
-client.on('connected', (address, port) =>  {
+client.on('connected', (address, port) => {
     try {
         setTimeout(() => {
             updateChannels(client).then(async r => {
@@ -157,14 +157,16 @@ client.on('message', async (channel, tags, message, self) => {
                             const isStreamer = channel.slice(1).toLowerCase() === tags.username.toLowerCase();
                             const isCreator = tags.username.toLowerCase() === process.env.CREATOR_CHANNEL;
                             if (!(playerIsMod || isStreamer || isCreator)) {
-                                await sendMessage(client, channel, 'Only the streamer or a moderator can use this command.');
+                                await sendMessage(client, channel, `Only the streamer or a moderator can use this command. @${tags.username}`);
                                 return;
                             }
                         }
-                        await printInfo(client, "raynnacs", `Command execute on channel: ${channel}`,`${playerIsMod ? `Mod: ` : isStreamer ? `Streamer: ` : `Viewer: `}${tags.username} has used the command: ${message}`);
+                        await info(`Command execute on channel: ${channel}`, `${playerIsMod ? `Mod: ` : isStreamer ? `Streamer: ` : `Viewer: `}${tags.username} has used the command: ${message}`);
                         let result = await commandInstance.execute(tags, channel, argument, client, await isBotModerator(client, channel));
                         if (result) {
-                            result += ` @${tags.username}`;
+                            if (!commands.isAvoidTag(commandInstance)) {
+                                result += ` @${tags.username}`;
+                            }
                             await sendMessage(client, channel, result);
                         }
                         //console.log(`[Channel: ${channel}] ${isModerator ? `[Mod] ` : ``}Esportal_Bot: ${result}`);
@@ -182,7 +184,7 @@ client.on('message', async (channel, tags, message, self) => {
 });
 
 const readline = require('readline');
-const {printInfo} = require("./log/Logger");
+const {info} = require("./log/Logger");
 
 process.on('SIGINT', async () => {
     let closingReason = false;

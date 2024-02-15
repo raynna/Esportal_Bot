@@ -119,6 +119,10 @@ class Commands {
     isModeratorCommand(commandInstance) {
         return commandInstance?.moderator ?? false;
     }
+
+    isAvoidTag(commandInstance) {
+        return commandInstance?.avoidTag ?? false;
+    }
 }
 
 module.exports = Commands;

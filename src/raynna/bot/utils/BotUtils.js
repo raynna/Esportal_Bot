@@ -10,7 +10,7 @@ const request = require('../requests/Request');
 const {getFontStyle} = require('./Fonts');
 const {getMapName} = require("./MapUtils");
 const {calculateRank} = require('./RankUtils');
-const {printInfo, info} = require('../log/Logger');
+const {info} = require('../log/Logger');
 
 let maintenance = {player: null, maintenance: false};
 let previousGathers = null;
@@ -354,31 +354,47 @@ async function changeFont(text, channel) {
         const styleMap = await getFontStyle(channel, settings);
         let isLink = false;
         let isTag = false;
+        let isEmote = false;
+        let emotes = ["DinoDance", "Kappa"];
         return text.split('').map((char, index) => {
             if (text.length - 1 === index && (char === ' ' || char === '\n')) {
                 return '';
             } else if ((char === ' ' || char === '\t' || char === '\n') && (isLink || isTag)) {
                 isLink = false;
                 isTag = false;
+                isEmote = false;
             } else if (text.substring(index).startsWith('https://') && !isLink) {
                 isLink = true;
+            } else if (emotes.some(emote => text.substring(index).startsWith(emote))) {
+                isEmote = true;
             } else if (char === '@' && !isLink) {
                 isTag = true;
             }
-            return (isLink || isTag) ? char : (styleMap[char] || char);
+            return (isLink || isTag || isEmote) ? char : (styleMap[char] || char);
         }).join('');
     } catch (error) {
         console.log(error);
     }
 }
 
+let lastMessageTime = 0;
+
 async function sendMessage(client, channel, message) {
     try {
+        const currentTime = new Date().getTime();
+        const timeElapsed = currentTime - lastMessageTime;
+
+        const isMod = await isBotModerator(client, channel);
+        const rateLimit = (channel.includes(process.env.CREATOR_CHANNEL) || isMod) ? 100 : 20;
+
+        if (timeElapsed < 30000 / rateLimit) {
+            console.log("Bot reached rateLimit");
+            return;
+        }
+        lastMessageTime = currentTime;
         if (message) {
             console.log(`[Channel: ${channel}]`, `[Esportal_Bot]`, message);
             await client.say(channel, await changeFont(message, channel));
-            if (!channel.includes(process.env.CREATOR_CHANNEL))
-                await client.say("raynnacs", message);
         }
     } catch (error) {
         console.error(error);

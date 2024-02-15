@@ -528,5 +528,17 @@
     },
     "toggled": [],
     "font": "bold"
+  },
+  "774926948": {
+    "twitch": {
+      "channel": "soilzey",
+      "username": "soilzey"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": [],
+    "font": "bold"
   }
 }
