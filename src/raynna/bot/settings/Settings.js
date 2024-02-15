@@ -30,15 +30,23 @@ class Settings {
 
         try {
             fs.writeFileSync(filePath, JSON.stringify(this.savedSettings, null, 2), 'utf8');
+            this.settings = await this.loadSettings();
         } catch (error) {
             console.error("Error saving settings:", error);
         }
     }
 
     async save(twitchId, channel, username) {
+        await this.create(twitchId);
         await this.check(twitchId);
         this.savedSettings[twitchId].twitch.channel = channel;
         this.savedSettings[twitchId].twitch.username = username;
+        await this.saveSettings();
+    }
+
+    async remove(twitchId) {
+        //await this.check(twitchId);
+        delete this.savedSettings[twitchId];
         await this.saveSettings();
     }
 
@@ -54,6 +62,14 @@ class Settings {
         }
     }
 
+    async create(twitchId) {
+        if (!this.savedSettings[twitchId]) {
+            this.savedSettings[twitchId] = {};
+            console.log(`Created new settings for ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId])}`);
+        }
+        await this.saveSettings();
+    }
+
     async check(twitchId) {
         try {
             if (twitchId === -1 || twitchId === undefined) {
@@ -63,9 +79,7 @@ class Settings {
             this.savedSettings = await this.loadSettings();
             let hasChanges = false;
             if (!this.savedSettings[twitchId]) {
-                this.savedSettings[twitchId] = {};
-                console.log(`Created new settings for ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId])}`);
-                hasChanges = true;
+                return;
             }
             if (this.savedSettings[twitchId]) {
                 if (!this.savedSettings[twitchId].twitch) {
@@ -95,7 +109,6 @@ class Settings {
                 }
                 if (hasChanges) {
                     await this.saveSettings();
-                    this.savedSettings = await this.loadSettings();
                     console.log(`Settings after save for twitch user ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId])}`);
                 }
             }

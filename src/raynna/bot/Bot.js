@@ -29,6 +29,23 @@ client.connect().then(() => {
     console.error(error);
 });
 
+
+async function reconnectBot() {
+    try {
+        await client.disconnect().then(async r => {
+            await client.connect();
+            console.log('Bot reconnected');
+        })
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+const reconnectInterval = 600 * 1000; // 10 minutes
+setInterval(async () => {
+    await reconnectBot();
+}, reconnectInterval);
+
 const updateInterval = 30 * 1000; // 30 seconds
 setInterval(() => {
     updateChannels(client).then(async r => {

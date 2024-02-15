@@ -76,6 +76,9 @@ async function getFontStyle(channel, settings) {
         }
         const {id: id, login: login, display_name: username} = twitch.data[0];
         await settings.check(id);
+        if (!settings.savedSettings[id]) {
+            return fontStyles['bold'];
+        }
         return fontStyles[settings.savedSettings[id].font];
     } catch (error) {
         console.log(error);

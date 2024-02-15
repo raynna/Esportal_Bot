@@ -1,4 +1,4 @@
-const { addChannel } = require('../../utils/BotUtils');
+const { addChannel, changeChannel} = require('../../utils/BotUtils');
 
 const {getData, RequestType} = require('../../requests/Request');
 
@@ -27,7 +27,7 @@ class ChangeList {
                 }
                 return message;
             }
-            let result = await addChannel(name);
+            let result = await changeChannel(name);
             await updateChannels(client);
             return result;
         } catch (error) {

@@ -17,14 +17,13 @@ async function updateChannels(client) {
         await Promise.all(connectedChannels.map(async (channel) => {
             try {
                 const channelExists = Object.values(settings.savedSettings).some(entry => entry.twitch.channel === channel);
-
                 if (!channelExists) {
                     // If the channel does not exist in savedSettings, remove it
                     channelsToLeave.add(channel);
                     hasChanges = true;
                 }
             } catch (error) {
-                console.error(`Error checking stream status for ${channel}:`, error);
+                console.error(`Error finding settings for ${channel}:`, error);
             }
         }));
 
@@ -66,14 +65,14 @@ async function updateChannels(client) {
             connectedChannels = Array.from(new Set([...connectedChannels, ...Array.from(channelsToJoin)]))
                 .filter(channel => !channelsToLeave.has(channel));
             if (channelsToJoin.size > 0) {
-                info(`CHANNELS JOINED`, Array.from(channelsToJoin));
+                await info(`CHANNELS JOINED`, Array.from(channelsToJoin));
             }
 
             if (channelsToLeave.size > 0) {
-                info('CHANNELS LEFT', Array.from(channelsToLeave));
+                await info('CHANNELS LEFT', Array.from(channelsToLeave));
             }
         } else {
-            info(`CHANNEL UPDATE`, `${connectedChannels.length} channels connected - ${connectedChannels.join(', ')}`);
+            await info(`CHANNEL UPDATE`, `${connectedChannels.length} channels connected - ${connectedChannels.join(', ')}`);
         }
 
     } catch (error) {

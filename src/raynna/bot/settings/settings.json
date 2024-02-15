@@ -210,6 +210,22 @@
     },
     "toggled": []
   },
+  "101878753": {
+    "twitch": {
+      "channel": "iggeboiii",
+      "username": "Iggeboiii"
+    },
+    "esportal": {
+      "id": 1057364132,
+      "name": "Iggeboiii"
+    },
+    "toggled": [
+      "news",
+      "dino",
+      "month"
+    ],
+    "font": "bold"
+  },
   "113257375": {
     "twitch": {
       "channel": "zoontw",
@@ -333,6 +349,18 @@
     "toggled": [
       "month"
     ],
+    "font": "bold"
+  },
+  "149354453": {
+    "twitch": {
+      "channel": "h3db4rg",
+      "username": "h3db4rg"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": [],
     "font": "bold"
   },
   "150145098": {
@@ -521,18 +549,6 @@
     "twitch": {
       "channel": "mribovic",
       "username": "mribovic"
-    },
-    "esportal": {
-      "name": "",
-      "id": -1
-    },
-    "toggled": [],
-    "font": "bold"
-  },
-  "774926948": {
-    "twitch": {
-      "channel": "soilzey",
-      "username": "soilzey"
     },
     "esportal": {
       "name": "",

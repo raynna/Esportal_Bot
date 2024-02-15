@@ -314,6 +314,57 @@ function arraysEqual(arr1, arr2) {
     }
 }*/
 
+async function changeChannel(channel) {
+    try {
+        const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
+        const {data: twitch, errorMessage: error} = await getData(RequestType.TwitchUser, channelWithoutHash);
+        if (error) {
+            console.log(error);
+            return error;
+        }
+        if (!twitch.data || twitch.data.length === 0) {
+            return `Something went from getting this twitch, no data`;
+        }
+        const {id: id, login: login, display_name: username} = twitch.data[0];
+        settings.savedSettings = await settings.loadSettings();
+        if (settings.savedSettings[id]) {
+            await settings.remove(id);
+            console.log(`Bot removed from channel: ${login} (id: ${id}).`);
+            return `Bot removed from channel: ${login} (id: ${id}).`;
+        }
+        await settings.save(id, login, username);
+        console.log(`Bot registered on channel: ${login} (id: ${id}).`);
+        return `Bot registered on channel: ${login} (id: ${id}).`;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function removeChannel(channel) {
+    try {
+        const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
+        const {data: twitch, errorMessage: error} = await getData(RequestType.TwitchUser, channelWithoutHash);
+        if (error) {
+            console.log(error);
+            return error;
+        }
+        if (!twitch.data || twitch.data.length === 0) {
+            return `Something went from getting this twitch, no data`;
+        }
+        const {id: id, login: login, display_name: username} = twitch.data[0];
+        settings.savedSettings = await settings.loadSettings();
+        if (!settings.savedSettings[id]) {
+            console.log(`Twitch channel ${login} is not registered on the bot.`);
+            return `Twitch channel ${login} is not registered on the bot.`;
+        }
+        await settings.remove(id);
+        console.log(`Bot removed from channel: ${login} (id: ${id}).`);
+        return `Bot removed from channel: ${login} (id: ${id}).`;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 async function addChannel(channel) {
     try {
         const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
@@ -378,18 +429,24 @@ async function changeFont(text, channel) {
 }
 
 let lastMessageTime = 0;
+let messageCount = 0;
 
 async function sendMessage(client, channel, message) {
     try {
-        const currentTime = new Date().getTime();
+        const currentTime = Date.now();
         const timeElapsed = currentTime - lastMessageTime;
 
         const isMod = await isBotModerator(client, channel);
         const rateLimit = (channel.includes(process.env.CREATOR_CHANNEL) || isMod) ? 100 : 20;
 
-        if (timeElapsed < 30000 / rateLimit) {
+        if (timeElapsed < 30000 && messageCount === rateLimit) {
             console.log("Bot reached rateLimit");
             return;
+        }
+        if (timeElapsed >= 30000) {
+            messageCount = 1;
+        } else {
+            messageCount++;
         }
         lastMessageTime = currentTime;
         if (message) {
@@ -421,7 +478,9 @@ async function isStreamOnline(channel) {
         }
         if (streamData.data && streamData.data.length > 0) {
             const {user_id: twitchId} = streamData.data[0];
-            await settings.check(twitchId);
+            if (settings[twitchId]) {
+                await settings.check(twitchId);
+            }
         }
 
         //console.log(`data for channel: ${channel}: ${JSON.stringify(streamData)}, length: ${streamData.length}`);
@@ -440,6 +499,8 @@ module.exports = {
     isStreamOnline,
     sendMessage,
     addChannel,
+    removeChannel,
+    changeChannel,
     isBotModerator,
     checkGatherList,
     checkMaintenance,
