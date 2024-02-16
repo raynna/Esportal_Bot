@@ -35,16 +35,32 @@
     "toggled": [],
     "font": "bold"
   },
+  "37452555": {
+    "twitch": {
+      "channel": "andis88",
+      "username": "andis88"
+    },
+    "esportal": {
+      "id": 28916042,
+      "name": "aNDIS88"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
   "38009707": {
     "twitch": {
       "channel": "fribergcs",
       "username": "fribergCS"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 24295201,
+      "name": "friberg"
     },
-    "toggled": [],
+    "toggled": [
+      "news",
+      "cmd",
+      "dino"
+    ],
     "font": "bold"
   },
   "38019896": {

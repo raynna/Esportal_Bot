@@ -41,6 +41,15 @@ const RequestType = {
         link: 'https://api.twitch.tv/helix/users?login={channel}',
         values: ['{channel}']
     },
+    StreamData: {
+        name: 'Stream Data',
+        requiredHeader: Headers.TWITCH_HEADER,
+        errors: {
+            notFound: 'Twitch channel does not exist'
+        },
+        link: 'https://api.twitch.tv/helix/channels?broadcaster_id={broadcast_id}',
+        values: ['{broadcast_id}']
+    },
     TwitchById: {
         name: 'Twitch User By Id Data',
         requiredHeader: Headers.TWITCH_HEADER,

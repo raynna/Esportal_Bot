@@ -48,7 +48,7 @@ class Rank {
             }
             return resultString;
         } catch (error) {
-            console.error("An error has occured while executing command Rank");
+            console.log(`An error has occurred while executing command ${this.name}`, error);
         }
     }
 }

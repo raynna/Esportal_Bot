@@ -61,7 +61,7 @@ class Yesterday {
             const totalEloChange = eloChanges.reduce((sum, eloChange) => sum + eloChange, 0);
             return `${esportalName}'s stats yesterday: Games: ${totalGames}, Rating: ${totalEloChange > 0 ? '+' : ''}${totalEloChange}, Kills: ${totalKills}, Deaths: ${totalDeaths}, K/D: ${ratio}`;
         } catch (error) {
-            console.log(`An error has occured while executing command ${this.name}`);
+            console.log(`An error has occurred while executing command ${this.name}`, error);
         }
     }
 }

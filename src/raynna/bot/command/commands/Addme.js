@@ -12,7 +12,7 @@ class Addme {
             await updateChannels(client);
             return result;
         } catch (error) {
-            console.log(`An error has occured while executing command ${this.name}`);
+            console.log(`An error has occurred while executing command ${this.name}`, error);
         }
     }
 }

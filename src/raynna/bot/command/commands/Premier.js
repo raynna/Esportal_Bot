@@ -40,7 +40,7 @@ class Premier {
             }
             return `${username}'s Premier Rating: ${skillLevel.toLocaleString()}`;
         } catch (error) {
-            console.error(`An error has occured while executing command ${this.name}`);
+            console.log(`An error has occurred while executing command ${this.name}`, error);
         }
     }
     //custom command for nightbot

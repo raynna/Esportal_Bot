@@ -35,8 +35,7 @@ class TestRank {
             }
             return "No rank change detected.";
         } catch (error) {
-            console.log(`An error has occurred while executing command ${this.name}`);
-            return "An error occurred while processing the command.";
+            console.log(`An error has occurred while executing command ${this.name}`, error);
         }
     }
 }

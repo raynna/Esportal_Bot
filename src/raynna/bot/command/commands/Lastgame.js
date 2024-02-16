@@ -46,7 +46,7 @@ class Lastgame {
             const formattedDate = `${day}/${month}-${year}`;
             return `${username}'s previous game: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsRatio}%, K/D: ${ratio}, Played: ${formattedDate}`;
         } catch (error) {
-            console.log(`An error has occured while executing command ${this.name}`);
+            console.log(`An error has occurred while executing command ${this.name}`, error);
         }
     }
 }

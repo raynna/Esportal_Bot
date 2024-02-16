@@ -6,7 +6,8 @@ const symbols = {
     '❤️': '\u2764\uFE0F', // Red Heart
     '💜': '\uD83D\uDC9C', // Purple Heart
     '🤍': '\uD83E\uDD0D', // White Heart
-    '🖤': '\u2B1B',       // Black Square
+    '🤎': '\uD83E\uDD0E',  // Brown Heart
+    '🖤': '\u2665',       // Black Square
     '🟥': '\uD83D\uDFE5', // Red Square
     '🟧': '\uD83E\uDDE7', // Orange Square
     '🟨': '\uD83E\uDDE8', // Yellow Square
@@ -40,7 +41,7 @@ const rankNames = [
     '\uD83D\uDC9AVeteran I',
     '\uD83D\uDCB4Gold II',
     '\uD83D\uDCB4Gold I',
-    '\uD83E\uDD0DSilver'];
+    '\uD83E\uDD0ESilver'];
 const rankThresholds = {
     '\uD83E\uDD0DLegend': 2000,
     '\uD83D\uDC9CPro II': 1900,
@@ -53,7 +54,7 @@ const rankThresholds = {
     '\uD83D\uDC9AVeteran I': 1200,
     '\uD83D\uDCB4Gold II': 1100,
     '\uD83D\uDCB4Gold I': 1000,
-    '\uD83E\uDD0DSilver': 0
+    '\uD83E\uDD0ESilver': 0
 };
 
 

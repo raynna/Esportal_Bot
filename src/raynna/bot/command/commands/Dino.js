@@ -10,7 +10,7 @@ class Dino {
             //await client.say(channel, "DinoDance DinoDance DinoDance");
             return "DinoDance DinoDance DinoDance";
         } catch (error) {
-            console.log(`An error has occured while executing command ${this.name}`);
+            console.log(`An error has occurred while executing command ${this.name}`, error);
         }
     }
 }

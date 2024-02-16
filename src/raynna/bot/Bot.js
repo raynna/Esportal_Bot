@@ -5,12 +5,13 @@ const tmi = require("tmi.js");
 const Commands = require('./command/Commands');
 const commands = new Commands();
 
+
 const {isBotModerator, TestCheck, TestMatchList, checkMatches} = require('./utils/BotUtils');
 
 const {updateChannels, connectedChannels} = require('./channels/Channels');
 const {sendMessage, checkGatherList, checkMaintenance} = require('./utils/BotUtils');
 
-const {showRequests} = require('./requests/Request');
+const {showRequests, getData, RequestType} = require('./requests/Request');
 
 const client = new tmi.Client({
     connection: {
@@ -157,27 +158,28 @@ client.on('message', async (channel, tags, message, self) => {
                 const commandInstance = commands.commands[commandTrigger];
                 if (commandInstance && typeof commandInstance.execute === 'function') {
                     try {
-                        if (await commands.isBlockedCommand(commandInstance, channel)) {
-                            console.log(`Command ${command} is blocked in channel ${channel}`);
-                            return;
-                        }
+                        const playerIsMod = tags.mod
+                        const isStreamer = channel.slice(1).toLowerCase() === tags.username.toLowerCase();
+                        const isCreator = tags.username.toLowerCase() === process.env.CREATOR_CHANNEL;
+                        //cooldown to avoid spammed commands from same user
                         const commandCooldown = cooldowns[tags.username][channel];
                         if (commandCooldown && currentTime - commandCooldown < 3000) {
                             console.log(`Command cooldown active for user ${tags.username}`);
                             return;
                         }
-                        cooldowns[tags.username][channel] = currentTime;
-                        const playerIsMod = tags.mod
-                        const isStreamer = channel.slice(1).toLowerCase() === tags.username.toLowerCase();
+                        //avoid blocked commands by user
+                        if (await commands.isBlockedCommand(commandInstance, channel)) {
+                            console.log(`Command ${command} is blocked in channel ${channel}`);
+                            return;
+                        }
+                        //avoid mod commands to be executed by regular users.
                         if (commands.isModeratorCommand(commandInstance)) {
-                            const playerIsMod = tags.mod;
-                            const isStreamer = channel.slice(1).toLowerCase() === tags.username.toLowerCase();
-                            const isCreator = tags.username.toLowerCase() === process.env.CREATOR_CHANNEL;
                             if (!(playerIsMod || isStreamer || isCreator)) {
                                 await sendMessage(client, channel, `Only the streamer or a moderator can use this command. @${tags.username}`);
                                 return;
                             }
                         }
+                        cooldowns[tags.username][channel] = currentTime;
                         await info(`Command execute on channel: ${channel}`, `${playerIsMod ? `Mod: ` : isStreamer ? `Streamer: ` : `Viewer: `}${tags.username} has used the command: ${message}`);
                         let result = await commandInstance.execute(tags, channel, argument, client, await isBotModerator(client, channel));
                         if (result) {

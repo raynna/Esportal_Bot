@@ -45,7 +45,7 @@ class Toggle {
             }
             return `Couldn't find any command with trigger ${command}.`;
         } catch (error) {
-            console.log(`An error has occured while executing command ${this.name}`);
+            console.log(`An error has occurred while executing command ${this.name}`, error);
         }
     }
 }
