@@ -83,9 +83,12 @@ async function checkMatches(client, connectedChannels, changedMatches) {
             const username = entries.esportal.name;
             const {team1_score, team2_score, players, map_id, team1_avg_elo, team2_avg_elo} = match;
             let streamer = players.find(player => player.username.toLowerCase() === username.toLowerCase());
-            const mvp = players.reduce((prev, current) => (prev.kills > current.kills) ? prev : current);
-            const {kills, deaths, assists, headshots} = streamer;
+            const {kills, deaths, assists, headshots, elo, elo_change} = streamer;
+            const rank = await calculateRank(elo);
+            const newElo = elo + elo_change;
+            const newRank = await calculateRank(newElo);
             const streamersTeam = streamer ? streamer.team : 'N/A';
+            const mvp = players.reduce((prev, current) => (prev.kills > current.kills) ? prev : current);
             const won = streamersTeam === 1 ? team1_score > team2_score : team2_score > team1_score;
             const averageElo = streamersTeam === 1 ? `${team1_avg_elo}-${team2_avg_elo}` : `${team2_avg_elo}-${team1_avg_elo}`;
             const displayScore = streamersTeam === 1 ? `${team1_score} : ${team2_score}` : `${team2_score} : ${team1_score}`;
@@ -102,14 +105,10 @@ async function checkMatches(client, connectedChannels, changedMatches) {
                 result = `${username}'s ${mapName} match was canceled.`;
             }
             await sendMessage(client, channel, result);
-            const {elo, elo_change} = streamer;
-            const rank = calculateRank(elo);
-            const newElo = elo + elo_change;
-            const newRank = calculateRank(newElo);
 
             if (rank !== newRank) {
                 const rankChangeMessage = elo_change > 0 ? 'ranked up' : 'ranked down';
-                const rankChangeResult = `${username} ${rankChangeMessage}! ${rank} (${elo}) -> ${newRank} (${newElo}). @${channel.slice(1)}`;
+                const rankChangeResult = `${username} ${rankChangeMessage}! ${rank} (${elo}) -> ${newRank} (${newElo}). @${channel}`;
                 await sendMessage(client, channel, rankChangeResult);
             }
 

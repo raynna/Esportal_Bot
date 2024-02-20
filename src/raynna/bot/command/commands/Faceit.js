@@ -32,7 +32,6 @@ class Faceit {
             }
             const faceit = faceitData.payload;
             const { nickname, games, country } = faceit;
-            const { faceit_elo, skill_level } = games.cs2;
             const isBanned = await checkBannedFaceit(faceit, username, isBotModerator);
             if (isBanned) {
                 return isBanned;
@@ -52,6 +51,7 @@ class Faceit {
                 }
                 return response;
             }
+            const { faceit_elo, skill_level } = games.cs2;
             response = `${username}'s Faceit: ${nickname}, Elo: ${faceit_elo}, Level: ${skill_level}, Country: ${COUNTRY_CODES[country] || 'Unknown'}`;
             if (isBotModerator) {
                 response += ` https://www.faceit.com/sv/players/${nickname}`;

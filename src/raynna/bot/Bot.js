@@ -5,6 +5,7 @@ const tmi = require("tmi.js");
 const Commands = require('./command/Commands');
 const commands = new Commands();
 
+const { MongoClient } = require('mongodb');
 
 const {isBotModerator, TestCheck, TestMatchList, checkMatches} = require('./utils/BotUtils');
 
@@ -24,8 +25,8 @@ const client = new tmi.Client({
 });
 
 console.log("Connecting..");
-client.connect().then(() => {
-    console.log(`Connected!`);
+client.connect().then(async () => {
+    console.log(`Connected Esportal_Bot!`);
 }).catch((error) => {
     console.error(error);
 });

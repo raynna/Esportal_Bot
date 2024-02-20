@@ -8,7 +8,7 @@ class Delay {
     }
 
     async execute(tags, channel, argument, client, isBotModerator) {
-        return `Current disabled, needs more work`;
+        return "";
         try {
             const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
             const { data: twitchData, errorMessage: twitchError} = await getData(RequestType.TwitchUser, channelWithoutHash);

@@ -35,7 +35,7 @@ class Stats {
             const ratio = deaths !== 0 ? (kills / deaths).toFixed(2) : "N/A";
 
             const gameTypeName = gameType === 0 ? 'CS:GO' : 'CS2';
-            const { rank } = calculateRankAndPlacement(userData, gameType);
+            const { rank } = await calculateRankAndPlacement(userData, gameType);
 
             return `${username}'s stats for ${gameTypeName}, Rank: ${rank}, Games Played: ${gamesPlayed}, K/D: ${ratio}, Entry frags: ${entry_kills} (${entryRatio}%)`;
         } catch (error) {

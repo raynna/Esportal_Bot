@@ -59,7 +59,8 @@
     "toggled": [
       "news",
       "cmd",
-      "dino"
+      "dino",
+      "delay"
     ],
     "font": "bold"
   },
@@ -167,6 +168,18 @@
       "id": -1
     },
     "toggled": []
+  },
+  "65608762": {
+    "twitch": {
+      "channel": "esportal_whoopsy",
+      "username": "esportal_whoopsy"
+    },
+    "esportal": {
+      "id": 241322973,
+      "name": "Whoopsy"
+    },
+    "toggled": [],
+    "font": "bold"
   },
   "69255090": {
     "twitch": {
@@ -508,10 +521,11 @@
       "username": "4ndreass"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 38208945,
+      "name": "xdhabsii"
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   },
   "530692803": {
     "twitch": {

@@ -4,6 +4,7 @@ const {getData, RequestType} = require('../../requests/Request');
 
 const { getGamesData } = require("../../utils/GamesUtils");
 const {checkBannedPlayer} = require("../CommandUtils");
+const {getMapName} = require("../../utils/MapUtils");
 
 class Today {
     constructor() {
@@ -29,7 +30,7 @@ class Today {
             if (error) {
                 return error;
             }
-            const { id: esportalId, username: esportalName } = userData;
+            const { id: esportalId, username: esportalName, current_match } = userData;
             const isBanned = await checkBannedPlayer(userData, isBotModerator);
             if (isBanned) {
                 return isBanned;
@@ -37,6 +38,9 @@ class Today {
             const gamesData = await getGamesData(esportalId, "daily");
 
             if (!gamesData || gamesData.length === 0) {
+                if (current_match.id) {
+                    return this.showMatch(esportalName, current_match.id);
+                }
                 const recentGamesData = await getData(RequestType.RecentMatches, esportalId);
                 if (recentGamesData.errorMessage) {
                     return recentGamesData.errorMessage;
@@ -62,6 +66,24 @@ class Today {
             return `${esportalName}'s stats today: Games: ${totalGames}, Rating: ${totalEloChange > 0 ? '+' : ''}${totalEloChange}, Kills: ${totalKills}, Deaths: ${totalDeaths}, K/D: ${ratio}`;
         } catch (error) {
             console.log(`An error has occurred while executing command ${this.name}`, error);
+        }
+    }
+
+    async showMatch(username, matchId) {
+        try {
+            const {data: matchData, errorMessage: matchError} = await getData(RequestType.MatchData, matchId);
+            if (matchError) {
+                return matchError;
+            }
+
+            const {team1_score, team2_score, players, map_id} = matchData;
+            const player = players.find(player => player.username.toLowerCase() === username.toLowerCase());
+            const streamersTeam = player ? player.team : 'N/A';
+            const displayScore = streamersTeam === 1 ? `${team1_score} : ${team2_score}` : `${team2_score} : ${team1_score}`;
+            const mapName = await getMapName(map_id);
+            return `${username} is playing the first game for today: ${mapName}, Score: ${displayScore}, -> use !match for more information.`;
+        } catch (error) {
+            console.log(error);
         }
     }
 }

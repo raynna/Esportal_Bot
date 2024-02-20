@@ -1,6 +1,6 @@
 const symbols = {
     '🧡': '\uD83E\uDDA1', // Orange Heart
-    '💛': '\uD83D\uDCB4', // Yellow Heart
+    '💛': '\uD83D\uDCB3', // Yellow Heart
     '💚': '\uD83D\uDC9A', // Green Heart
     '💙': '\uD83D\uDC99', // Blue Heart
     '❤️': '\u2764\uFE0F', // Red Heart
@@ -29,36 +29,23 @@ const symbols = {
     '🔲': '\u25A0'        // Black Square Containing Black Small Square
 };
 
-const rankNames = [
-    '\uD83E\uDD0DLegend',
-    `\uD83D\uDC9CPro II`,
-    `\uD83D\uDC9CPro I`,
-    `\u2764\uFE0FElite II`,
-    '\u2764\uFE0FElite I',
-    '\uD83D\uDC99Master II',
-    '\uD83D\uDC99Master I',
-    '\uD83D\uDC9AVeteran II',
-    '\uD83D\uDC9AVeteran I',
-    '\uD83D\uDCB4Gold II',
-    '\uD83D\uDCB4Gold I',
-    '\uD83E\uDD0ESilver'];
-const rankThresholds = {
-    '\uD83E\uDD0DLegend': 2000,
-    '\uD83D\uDC9CPro II': 1900,
-    '\uD83D\uDC9CPro I': 1800,
-    '\u2764\uFE0FElite II': 1700,
-    '\u2764\uFE0FElite I': 1600,
-    '\uD83D\uDC99Master II': 1500,
-    '\uD83D\uDC99Master I': 1400,
-    '\uD83D\uDC9AVeteran II': 1300,
-    '\uD83D\uDC9AVeteran I': 1200,
-    '\uD83D\uDCB4Gold II': 1100,
-    '\uD83D\uDCB4Gold I': 1000,
-    '\uD83E\uDD0ESilver': 0
-};
+const ranks = [
+    {name: 'Legend', symbol: '🖤🤍', threshold: 2000},
+    {name: 'Pro II', symbol: '💜', threshold: 1900},
+    {name: 'Pro I', symbol: '💜', threshold: 1800},
+    {name: 'Elite II', symbol: '❤️', threshold: 1700},
+    {name: 'Elite I', symbol: '❤️', threshold: 1600},
+    {name: 'Master II', symbol: '💙', threshold: 1500},
+    {name: 'Master I', symbol: '💙', threshold: 1400},
+    {name: 'Veteran II', symbol: '💚', threshold: 1300},
+    {name: 'Veteran I', symbol: '💚', threshold: 1200},
+    {name: 'Gold II', symbol: '💛', threshold: 1100},
+    {name: 'Gold I', symbol: '💛', threshold: 1000},
+    {name: 'Silver', symbol: '🤍', threshold: 0}
+];
 
 
-function calculateRankAndPlacement(userData, gameType) {
+async function calculateRankAndPlacement(userData, gameType) {
     const {game_stats, leaderboard_position} = userData;
 
     const gameStats = game_stats[gameType];
@@ -69,20 +56,21 @@ function calculateRankAndPlacement(userData, gameType) {
     const matchesUntilRankUnlocked = matches_until_rank_unlocked || 0;
 
     if (rankLocked) {
-        const lockedRank = rankNames.find(r => elo >= rankThresholds[r]) || 'Unranked';
+        const lockedRank = await calculateRank(elo);
         return {
             rank: `Preliminary ${lockedRank}`,
             placement: `Matches Until Rank Unlocked: ${matchesUntilRankUnlocked}`
         };
     }
 
-    const rank = rankNames.find(r => elo >= rankThresholds[r]) || 'Unranked';
+    const rank = await calculateRank(elo);
     const placement = "Leaderboard placement: " + (gameType === 2 && leaderboard_position.toLocaleString() || 'N/A');
     return {rank, placement};
 }
 
-function calculateRank(elo) {
-    return rankNames.find(r => elo >= rankThresholds[r]) || 'Unranked';
+async function calculateRank(elo) {
+    const foundRank = ranks.find(rank => elo >= rank.threshold);
+    return foundRank ? foundRank.symbol + foundRank.name : 'Unranked';
 }
 
 module.exports = {calculateRankAndPlacement, calculateRank};

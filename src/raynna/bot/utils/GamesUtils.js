@@ -80,7 +80,8 @@ function isMatchPlayedYesterday(timestamp, currentDate) {
     return (
         matchDate.getUTCDate() === currentDate.getUTCDate() - 1 &&
         matchDate.getUTCMonth() === currentDate.getUTCMonth() &&
-        matchDate.getUTCFullYear() === currentDate.getUTCFullYear()
+        matchDate.getUTCFullYear() === currentDate.getUTCFullYear() &&
+        matchDate.getUTCHours() === currentDate.getUTCHours() - 1
     );
 }
 
@@ -89,7 +90,8 @@ function isMatchPlayedToday(timestamp, currentDate) {
     return (
         matchDate.getUTCDate() === currentDate.getUTCDate() &&
         matchDate.getUTCMonth() === currentDate.getUTCMonth() &&
-        matchDate.getUTCFullYear() === currentDate.getUTCFullYear()
+        matchDate.getUTCFullYear() === currentDate.getUTCFullYear() &&
+        matchDate.getUTCHours() === currentDate.getUTCHours() - 1
     );
 }
 
