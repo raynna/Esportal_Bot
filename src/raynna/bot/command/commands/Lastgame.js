@@ -30,7 +30,7 @@ class Lastgame {
             if (recentError) {
                 return recentError;
             }
-            const mostRecent = recentGame[0];
+            const mostRecent = await recentGame[0];
             const { winner, map_id, inserted } = mostRecent;
             const { kills, deaths, assists, headshots } = mostRecent.stats;
             const { team1_score, team2_score } = mostRecent.info;

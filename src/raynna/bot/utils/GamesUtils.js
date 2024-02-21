@@ -11,7 +11,9 @@ async function getGamesData(userId, duration = "daily") {
                 duration === "yesterday" ? match => isMatchPlayedYesterday(match.inserted, currentDate) :
                         match => isMatchPlayedToday(match.inserted, currentDate);
 
-
+        allMatches.forEach(match => {
+            console.log(`Match played: ${new Date(match.inserted * 1000)}`);
+        });
         const filteredMatches = allMatches.filter(filterFunction);
         /*filteredMatches.forEach(match => {
             console.log(`Match played: ${new Date(match.inserted * 1000)}, elo: ${match.elo_change}`);
@@ -78,35 +80,34 @@ async function getAllMatches(userId, duration) {
 function isMatchPlayedYesterday(timestamp, currentDate) {
     const matchDate = new Date(timestamp * 1000);
     return (
-        matchDate.getUTCDate() === currentDate.getUTCDate() - 1 &&
-        matchDate.getUTCMonth() === currentDate.getUTCMonth() &&
-        matchDate.getUTCFullYear() === currentDate.getUTCFullYear() &&
-        matchDate.getUTCHours() === currentDate.getUTCHours() - 1
+        matchDate.getDate() === currentDate.getDate() - 1 &&
+        matchDate.getMonth() === currentDate.getMonth() &&
+        matchDate.getFullYear() === currentDate.getFullYear()
     );
 }
 
 function isMatchPlayedToday(timestamp, currentDate) {
     const matchDate = new Date(timestamp * 1000);
     return (
-        matchDate.getUTCDate() === currentDate.getUTCDate() &&
-        matchDate.getUTCMonth() === currentDate.getUTCMonth() &&
-        matchDate.getUTCFullYear() === currentDate.getUTCFullYear() &&
-        matchDate.getUTCHours() === currentDate.getUTCHours() - 1
+        matchDate.getDay() === currentDate.getDay() &&
+        matchDate.getMonth() === currentDate.getMonth() &&
+        matchDate.getFullYear() === currentDate.getFullYear()
     );
 }
 
 function isMatchPlayedWithinLastWeek(timestamp, currentDate) {
     const matchDate = new Date(timestamp * 1000);
     const oneWeekAgo = new Date();
-    oneWeekAgo.setUTCDate(currentDate.getUTCDate() - 7);
+    oneWeekAgo.setDate(currentDate.getDate() - 7);
     return matchDate >= oneWeekAgo && matchDate < currentDate;
 }
 
 function isMatchPlayedWithinMonth(timestamp, currentDate) {
     const matchDate = new Date(timestamp * 1000);
     const oneMonthAgo = new Date();
-    oneMonthAgo.setUTCDate(currentDate.getUTCDate() - 30);
+    oneMonthAgo.setDate(currentDate.getDate() - 30);
     return matchDate >= oneMonthAgo && matchDate < currentDate;
 }
+
 
 module.exports = {getGamesData};
