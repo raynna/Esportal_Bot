@@ -7,13 +7,13 @@ const {checkBannedPlayer} = require("../CommandUtils");
 
 class Month {
     constructor() {
+        this.disabled = true;
         this.name = 'Month';
         this.triggers = ['månad'];
         this.settings = new Settings();
     }
 
     async execute(tags, channel, argument, client, isBotModerator) {
-        return `This command is currently disabled`;
         try {
             const channelWithoutHash = channel.startsWith('#') ? channel.replace('#', '').toLowerCase() : channel.toLowerCase();
             const { data: twitch, errorMessage: twitchError } = await getData(RequestType.TwitchUser, channelWithoutHash);
@@ -25,6 +25,11 @@ class Month {
             const name = argument ? argument.trim() : await this.settings.getEsportalName(twitchId);
             if (!name) {
                 return `Streamer need to register an Esportal name -> !esportalname name @${channel.slice(1)}`;
+            }
+            if (this.disabled) {
+                this.settings.savedSettings[twitchId].toggled.push(this.name.toLowerCase());
+                await this.settings.saveSettings();
+                return `Command ${this.name} is currently disabled.`;
             }
             const { data: userData, errorMessage: error } = await getData(RequestType.UserData, name);
             if (error) {

@@ -76,8 +76,6 @@ async function checkMatches(client, connectedChannels, changedMatches) {
         }
 
         if (streamers.length > 0) {
-            const delay = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
-            await delay(20000);
             let completedGathers = [];
             let canceledGathers = [];
             let startedGathers = [];
@@ -137,9 +135,9 @@ async function checkMatches(client, connectedChannels, changedMatches) {
                     const { data: match, errorMessage: matchError } = await getData(RequestType.MatchData, matchId);
 
                     if (!matchError) {
-                        const { players, map_id, team1_avg_elo, team2_avg_elo } = match;
+                        const { players, map_id, team1_avg_elo, team2_avg_elo } = await match;
                         const mapName = await getMapName(map_id);
-                        const streamer = players.find(player => player.username.toLowerCase() === username.toLowerCase());
+                        const streamer = await players.find(player => player.username.toLowerCase() === username.toLowerCase());
                         const streamersTeam = streamer ? streamer.team : 'N/A';
                         const averageElo = streamersTeam === 1 ? `${team1_avg_elo}-${team2_avg_elo}` : `${team2_avg_elo}-${team1_avg_elo}`;
                         const result = `${username} started a match: ${mapName}, Avg ratings: ${averageElo}`;
@@ -162,11 +160,11 @@ async function checkMatches(client, connectedChannels, changedMatches) {
                     const { data: match, errorMessage: matchError } = await getData(RequestType.MatchData, matchId);
 
                     if (!matchError) {
-                        const { team1_score, team2_score, players, map_id } = match;
-                        const streamer = players.find(player => player.username.toLowerCase() === username.toLowerCase());
+                        const { team1_score, team2_score, players, map_id } = await match;
+                        const streamer = await players.find(player => player.username.toLowerCase() === username.toLowerCase());
 
                         if (streamer) {
-                            const { kills, deaths, assists, headshots, elo } = streamer;
+                            const { kills, deaths, assists, headshots, elo, elo_change } = await streamer;
                             const mvp = players.reduce((prev, current) => (prev.kills > current.kills) ? prev : current);
                             const streamersTeam = streamer.team || 'N/A';
                             const won = streamersTeam === 1 ? team1_score > team2_score : team2_score > team1_score;
@@ -176,19 +174,19 @@ async function checkMatches(client, connectedChannels, changedMatches) {
                             const hsRatio = headshots !== 0 ? Math.floor(headshots / kills * 100).toFixed(0) : "0";
                             const mapName = await getMapName(map_id);
 
-                            let result = `${username} just ${matchResult} a match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsRatio}%, K/D: ${ratio}, MVP: ${mvp.username}`;
+                            let result = '';
 
                             const { data: recentMatch, errorMessage: recentMatchError } = await getData(RequestType.RecentMatches, userId);
 
                             if (recentMatchError) {
+                                result = `${username} just ${matchResult} a match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsRatio}%, K/D: ${ratio}, MVP: ${mvp.username}`;
                                 console.log(`Error on getting recent match on completed match.`, recentMatchError);
                                 await sendMessage(client, channel, result);
                             } else {
-                                const elo_change = await recentMatch[0].elo_change;
                                 const rank = await calculateRank(elo);
                                 const newElo = elo + elo_change;
                                 const newRank = await calculateRank(newElo);
-                                const eloString = elo_change !== 0 ? ` (${elo_change > 0 ? `+` : ``}${elo_change})` : ``;
+                                const eloString = elo_change && elo_change !== 0 ? ` (${elo_change > 0 ? `+` : ``}${elo_change})` : ``;
                                 result = `${username} just ${matchResult}${eloString} a match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsRatio}%, K/D: ${ratio}, MVP: ${mvp.username}`;
                                 await sendMessage(client, channel, result);
 

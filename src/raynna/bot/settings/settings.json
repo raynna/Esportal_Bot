@@ -8,7 +8,9 @@
       "id": 145746758,
       "name": "Tiimwork"
     },
-    "toggled": [],
+    "toggled": [
+      "month"
+    ],
     "font": "bold"
   },
   "30538510": {
@@ -72,6 +74,18 @@
     "esportal": {
       "id": 889046928,
       "name": "HeatoN"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "38689464": {
+    "twitch": {
+      "channel": "ralleball33",
+      "username": "ralleball33"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
     },
     "toggled": [],
     "font": "bold"
@@ -214,7 +228,8 @@
       "name": "",
       "id": -1
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   },
   "78501398": {
     "twitch": {
@@ -330,14 +345,26 @@
     ],
     "font": "bold"
   },
-  "142494422": {
+  "141813151": {
     "twitch": {
-      "channel": "drudiuzesportal",
-      "username": "DrudiuzEsportal"
+      "channel": "diivan",
+      "username": "diivan"
     },
     "esportal": {
-      "id": 97810885,
-      "name": "Drudiuz"
+      "id": 389283394,
+      "name": "DeagleDiivan"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "142494422": {
+    "twitch": {
+      "channel": "drudiuzz",
+      "username": "drudiuzz"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
     },
     "toggled": [],
     "font": "bold"
@@ -376,7 +403,8 @@
       "name": "5X5X5"
     },
     "toggled": [
-      "month"
+      "month",
+      "delay"
     ],
     "font": "bold"
   },
@@ -439,6 +467,18 @@
     },
     "toggled": []
   },
+  "180604126": {
+    "twitch": {
+      "channel": "adamskiifn",
+      "username": "adamskiifn"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": [],
+    "font": "bold"
+  },
   "189243698": {
     "twitch": {
       "channel": "luukascs",
@@ -491,6 +531,21 @@
     ],
     "font": "bold"
   },
+  "461865375": {
+    "twitch": {
+      "channel": "1zukoo",
+      "username": "1Zukoo"
+    },
+    "esportal": {
+      "id": 991391006,
+      "name": "1Zukoo"
+    },
+    "toggled": [
+      "delay",
+      "news"
+    ],
+    "font": "bold"
+  },
   "467664914": {
     "twitch": {
       "channel": "lasseman86",
@@ -512,7 +567,9 @@
       "id": 64482212,
       "name": "Raynna"
     },
-    "toggled": [],
+    "toggled": [
+      "month"
+    ],
     "font": "bold"
   },
   "505227161": {
@@ -579,6 +636,18 @@
     "twitch": {
       "channel": "mribovic",
       "username": "mribovic"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "1015930937": {
+    "twitch": {
+      "channel": "nollettan",
+      "username": "Nollettan"
     },
     "esportal": {
       "name": "",

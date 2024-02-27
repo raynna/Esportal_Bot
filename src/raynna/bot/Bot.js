@@ -61,7 +61,7 @@ setInterval(async () => {
     });
 }, maintenanceInterval);
 
-const gathersInterval = 30 * 1000;
+const gathersInterval = 15 * 1000;
 setInterval(async () => {
     await checkGatherList(client, connectedChannels);
 }, gathersInterval);

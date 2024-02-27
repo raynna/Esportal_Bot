@@ -30,7 +30,7 @@ const symbols = {
 };
 
 const ranks = [
-    {name: 'Legend', symbol: '🖤🤍', threshold: 2000},
+    {name: 'Legend', symbol: '🖤', secondarySymbol: '🤍', threshold: 2000},
     {name: 'Pro II', symbol: '💜', threshold: 1900},
     {name: 'Pro I', symbol: '💜', threshold: 1800},
     {name: 'Elite II', symbol: '❤️', threshold: 1700},
@@ -70,6 +70,9 @@ async function calculateRankAndPlacement(userData, gameType) {
 
 async function calculateRank(elo) {
     const foundRank = ranks.find(rank => elo >= rank.threshold);
+    if (foundRank.secondarySymbol) {
+        return foundRank ? foundRank.symbol + foundRank.name + foundRank.secondarySymbol : 'Unranked';
+    }
     return foundRank ? foundRank.symbol + foundRank.name : 'Unranked';
 }
 

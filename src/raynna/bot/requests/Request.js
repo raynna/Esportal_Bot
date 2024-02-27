@@ -80,18 +80,29 @@ const RequestType = {
     GatherData: {
         name: 'Gather Data',
         errors: {
-            notFound: 'This gather does not exist on Esportal'
+            notFound: 'This gather does not exist on Esportal',
+            webisteDown: 'Esportal seems to be offline for the moment.'
         },
         link: 'https://api.esportal.com/gather/get?_=0&id={gatherId}',
         values: ['{gatherId}'],
-    },
+    },//https://api.faceit.com/stats/v1/stats/users/${userId}/games/cs2
     FaceItData: {
         name: 'Faceit Data',
         errors: {
-            notFound: 'This player does not exist on Faceit'
+            notFound: 'This player does not exist on Faceit',
+            webisteDown: 'Faceit seems to be offline for the moment.'
         },
         link: 'https://api.faceit.com/users/v1/nicknames/{username}',
         values: ['{username}'],
+    },
+    FaceItStats: {
+        name: 'Faceit stats',
+        errors: {
+            notFound: 'This player does not exist on Faceit',
+            webisteDown: 'Faceit seems to be offline for the moment.'
+        },
+        link: 'https://api.faceit.com/stats/v1/stats/users/{userId}/games/cs2',
+        values: ['{userId}'],
     },
     FaceitFinder: {
         name: 'Faceit Finder',
@@ -101,7 +112,8 @@ const RequestType = {
     RecentMatchData: {
         name: 'Recent Match Data',
         errors: {
-            notFound: 'This gather does not exist on Esportal'
+            notFound: 'This gather does not exist on Esportal',
+            webisteDown: 'Esportal seems to be offline for the moment.'
         },
         link: 'https://esportal.com/api/user_profile/get_latest_matches?_=0&id={userId}&page={page}&v=2',
         values: ['{userId}', '{page}']
@@ -109,7 +121,8 @@ const RequestType = {
     RecentMatches: {
         name: 'Recent Matches',
         errors: {
-            notFound: 'This gather does not exist on Esportal'
+            notFound: 'This gather does not exist on Esportal',
+            webisteDown: 'Esportal seems to be offline for the moment.'
         },
         link: 'https://esportal.com/api/user_profile/get_latest_matches?_=0&id={userId}&page=1&v=2',
         values: ['{userId}']
@@ -117,7 +130,8 @@ const RequestType = {
     MatchData: {
         name: 'Match Data',
         errors: {
-            notFound: 'This match does not exist on Esportal'
+            notFound: 'This match does not exist on Esportal',
+            webisteDown: 'Esportal seems to be offline for the moment.'
         },
         link: 'https://esportal.com/api/match/get?_=0&id={matchId}',
         values: ['{matchId}']
@@ -276,10 +290,18 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
                         case 500:
                             return {data: null, errorMessage: ""};
                         case 502:
+                            if (additionalParams && additionalParams.webisteDown) {
+                                console.log(additionalParams.webisteDown);
+                                return {data: null, errorMessage: additionalParams.webisteDown};
+                            }
                             return {data: null, errorMessage: `Bad Gateway: ${error.response.status}`};
                         case 503:
                             return {data: null, errorMessage: `Service Unavailable: ${error.response.status}`};
                         case 504:
+                            if (additionalParams && additionalParams.webisteDown) {
+                                console.log(additionalParams.webisteDown);
+                                return {data: null, errorMessage: additionalParams.webisteDown};
+                            }
                             return {data: null, errorMessage: `Gateway Timeout: ${error.response.status}`};
                         case 522:
                             if (additionalParams && additionalParams.webisteDown) {
