@@ -629,7 +629,9 @@
       "id": 21678271,
       "name": "navy"
     },
-    "toggled": [],
+    "toggled": [
+      "delay"
+    ],
     "font": "bold"
   },
   "770380917": {
