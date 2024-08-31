@@ -64,7 +64,7 @@ async function calculateRankAndPlacement(userData, gameType) {
     }
 
     const rank = await calculateRank(elo);
-    const placement = "Leaderboard placement: " + (gameType === 2 && leaderboard_position.toLocaleString() || 'N/A');
+    const placement = "Leaderboard placement: " + (gameType === 2 && leaderboard_position || 'N/A');
     return {rank, placement};
 }
 

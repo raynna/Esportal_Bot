@@ -10,13 +10,18 @@ async function checkBannedPlayer(userData, isModerator) {
             if (ban !== null) {
                 reason = ban.reason;
             }
-            if (reason !== `Chat abuse`) {
+ 		response = `${esportalName} is banned from playing Esportal. -> Reason: ${reason}!`
+                if (isModerator) {
+                    response += ` https://esportal.com/sv/profile/${esportalName}`;
+                }
+                return response;
+            /*if (reason !== `Chat abuse`) {
                 response = `${esportalName} is banned from playing Esportal. -> Reason: ${reason}!`
                 if (isModerator) {
                     response += ` https://esportal.com/sv/profile/${esportalName}`;
                 }
                 return response;
-            }
+            }*/
         }
         return response;
     } catch (error) {

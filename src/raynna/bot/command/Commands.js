@@ -65,11 +65,51 @@ class Commands {
 
         const nonModeratorCommands = commands.filter(command => {
             const instance = new command.class();
+            return !instance.moderator && !instance.emote && !instance.disabled;
+        });
+
+        return nonModeratorCommands.map(command => command.name);
+    }
+
+
+    static getAllCommands() {
+        const commandsFolder = path.join('src/raynna/bot/command/commands/');
+        const commands = fs.readdirSync(commandsFolder)
+            .filter(file => fs.statSync(path.join(commandsFolder, file)).isFile())
+            .map(file => {
+                const commandName = path.parse(file).name;
+                const CommandClass = require(path.join(__dirname, '.', 'commands', file));
+
+                return { name: commandName, class: CommandClass };
+            });
+
+        const nonModeratorCommands = commands.filter(command => {
+            const instance = new command.class();
             return !instance.moderator;
         });
 
         return nonModeratorCommands.map(command => command.name);
     }
+
+    static getEmoteCommands() {
+        const commandsFolder = path.join('src/raynna/bot/command/commands/');
+        const commands = fs.readdirSync(commandsFolder)
+            .filter(file => fs.statSync(path.join(commandsFolder, file)).isFile())
+            .map(file => {
+                const commandName = path.parse(file).name;
+                const CommandClass = require(path.join(__dirname, '.', 'commands', file));
+                const instance = new CommandClass();
+
+                if (instance.emote) {
+                    return { name: commandName, class: CommandClass };
+                }
+
+                return null;
+            }).filter(command => command !== null);
+
+        return commands.map(command => command.name);
+    }
+
 
 
     commandExists(commandName) {
@@ -122,6 +162,10 @@ class Commands {
 
     isAvoidTag(commandInstance) {
         return commandInstance?.avoidTag ?? false;
+    }
+
+    isEmoteCommand(commandInstance) {
+        return commandInstance?.emote ?? false;
     }
 }
 

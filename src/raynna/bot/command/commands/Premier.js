@@ -30,7 +30,7 @@ class Premier {
             for (const game of games) {
                 if (game == null)
                     continue;
-                if (game.dataSource === `matchmaking` && game.skillLevel !== null && game.skillLevel !== 0 && game.isCs2) {
+                if (game.dataSource === `matchmaking` && game.skillLevel !== null && game.skillLevel !== 0 && game.isCs2 && game.rankType === 11) {
                     skillLevel = game.skillLevel;
                     break;
                 }

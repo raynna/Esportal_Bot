@@ -20,7 +20,7 @@ const RequestType = {
     },
     News: {
         name: 'News',
-        link: 'https://esportal.com/api/news/latest?_=1706788049251&language=sv&limit=13&offset=0&region_id=0&subregion_id=0&country_id=210&show_18plus=true'
+        link: 'https://esportal.com/api/news/latest?_=0&language=sv&limit=13&offset=0&region_id=0&subregion_id=0&country_id=210&show_18plus=true'
     },
     StreamStatus: {
         name: 'Twitch Status Data',
@@ -75,6 +75,16 @@ const RequestType = {
             webisteDown: 'Esportal seems to be offline for the moment.'
         },
         link: 'https://api.esportal.com/user_profile/get?_=0&username={name}&bans=1&current_match=1&team=1',
+        values: ['{name}']
+    },
+    TestRequest: {
+        name: 'Test request Data',
+        errors: {
+            notFound: 'This player does not exist on Esportal.',
+            badRequest: 'This is not a valid Esportalname.',
+            webisteDown: 'Esportal seems to be offline for the moment.'
+        },
+        link: 'https://api.esportal.com/user_profile_testing/get?_=0&username={name}&bans=1&current_match=1&team=1',
         values: ['{name}']
     },
     GatherData: {
@@ -206,9 +216,9 @@ async function getData(requestType, ...args) {
     };
     try {
         await addRequests(requestType);
-        if (requestType === RequestType.MatchList)
-            console.log(url);
-        return await handleRequest(async () => {
+        //if (requestType === RequestType.MatchList)
+            //console.log(url);
+        return await handleRequest(async () => {	
             const response = await axios.get(url, config);
             if (requestType === RequestType.FaceitFinder) {
                 console.log(`requestType: ${requestType.name}`);
@@ -273,6 +283,7 @@ async function handleRequest(requestFunction, additionalParams = {}, maxRetries 
                         case 401:
                             return {data: null, errorMessage: `Unauthorized: ${error.response.status}`};
                         case 403:
+                            disabled = true;
                             return {data: null, errorMessage: `Forbidden: ${error.response.status}`};
                         case 404:
                             if (additionalParams && additionalParams.notFound) {

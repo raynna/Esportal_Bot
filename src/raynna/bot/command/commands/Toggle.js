@@ -13,8 +13,8 @@ class Toggle {
         try {
             this.settings.savedSettings = await this.settings.loadSettings();
             const command = argument ? argument.toLowerCase().trim() : "";
-            const validCommands = this.commands.getValidCommands();
-            const formattedList = this.commands.formatCommandList(validCommands);
+            const allCommands = this.commands.getAllCommands();
+            const formattedList = this.commands.formatCommandList(allCommands);
             if (!command) {
                 return `Please provide a command, usage; -> !toggle command, commands -> ${formattedList}`;
             }
@@ -26,7 +26,7 @@ class Toggle {
             const { id: twitchId } = twitch.data[0];
             await this.settings.check(twitchId);
             if (command === 'enabled') {
-                const enabled = validCommands.filter(command => !this.settings.savedSettings[twitchId].toggled.includes(command.toLowerCase()));
+                const enabled = allCommands.filter(command => !this.settings.savedSettings[twitchId].toggled.includes(command.toLowerCase()));
                 const formattedList = this.commands.formatCommandList(enabled);
                 return `Enabled commands in ${channel} are: ${formattedList}`;
             }
@@ -38,7 +38,7 @@ class Toggle {
             if (command === 'toggle') {
                 return `You can't toggle this command.`;
             }
-            const commandClass = this.commands.findCommandClassByTrigger(command, validCommands);
+            const commandClass = this.commands.findCommandClassByTrigger(command, allCommands);
             if (commandClass) {
                 const triggers = this.commands.getCommandTriggers(commandClass);
                 return this.settings.toggle(twitchId, command, triggers);

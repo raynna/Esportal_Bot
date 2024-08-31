@@ -107,6 +107,11 @@ class Settings {
                     console.log(`Tranformed toggle settings for: ${twitchId} to array: ${JSON.stringify(this.savedSettings[twitchId].toggled)}`);
                     hasChanges = true;
                 }
+		    if (this.savedSettings[twitchId].custom) {
+			  this.savedSettings[twitchId].custom = [];
+			  console.log(`Created custom settings for: ${twitchId}`);
+			  hasChanges = true;			
+		    }
                 if (hasChanges) {
                     await this.saveSettings();
                     console.log(`Settings after save for twitch user ${twitchId}: ${JSON.stringify(this.savedSettings[twitchId])}`);

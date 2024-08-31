@@ -5,8 +5,6 @@ const tmi = require("tmi.js");
 const Commands = require('./command/Commands');
 const commands = new Commands();
 
-const { MongoClient } = require('mongodb');
-
 const {isBotModerator, TestCheck, TestMatchList, checkMatches} = require('./utils/BotUtils');
 
 const {updateChannels, connectedChannels} = require('./channels/Channels');
@@ -61,7 +59,7 @@ setInterval(async () => {
     });
 }, maintenanceInterval);
 
-const gathersInterval = 15 * 1000;
+const gathersInterval = 30 * 1000; // 30 seconds
 setInterval(async () => {
     await checkGatherList(client, connectedChannels);
 }, gathersInterval);
@@ -69,9 +67,11 @@ setInterval(async () => {
 client.on('connected', (address, port) => {
     try {
         setTimeout(() => {
+console.log(`Bot connected with ip: ${address}:${port}`);
+
             updateChannels(client).then(async r => {
                 await showRequests();
-                //await addChannel("raynnacs");
+	                //await addChannel("raynnacs");
                 /*if (!settings.saveSettings.hasOwnProperty("#raynnacs")) {
                     const requestType = RequestType.TwitchUser;
                     const { data: twitchData, errorMessage: twitchError } = await getData(requestType, "raynnacs");
@@ -137,6 +137,36 @@ client.on('message', async (channel, tags, message, self) => {
             } else {
                 messageCounts[tags.username]++;
             }
+            if (message.toLowerCase().startsWith("testrequest")) {
+                if (tags.username.toLowerCase() !== process.env.CREATOR_CHANNEL.toLowerCase()) {
+                    return;
+                }
+                const requestType = RequestType.TestRequest;
+                const { data: request, errorMessage: message } = await getData(requestType, "raynna");
+                if (message) {
+                    if (requestType.errors.notFound) {
+                        await sendMessage(client, channel, requestType.errors.notFound);
+                    }
+                    await sendMessage(client, channel, `Sent a testing request`);
+                }
+            }
+            if (message.toLowerCase().startsWith("announce")) {
+                if (tags.username.toLowerCase() !== process.env.CREATOR_CHANNEL.toLowerCase()) {
+                    return;
+                }
+                const announcement = message.slice("announce".length).trim() || "No reason";
+                for (const connected of connectedChannels) {
+                    await sendMessage(client, connected, `Announcement from ${tags.username}: ${announcement}`);
+                }
+                return;
+            }
+            if (message.toLowerCase().startsWith("say")) {
+                const parts = message.slice("say".length).trim().split(" ");
+                const username = parts[0];
+                const streamerMessage = parts.slice(1).join(" ");
+                await sendMessage(client, username, `Message from ${tags.username}: ${streamerMessage}`);
+                return;
+            }
             if (message.toLowerCase().startsWith("stopbot")) {
                 if (tags.username.toLowerCase() !== process.env.CREATOR_CHANNEL.toLowerCase()) {
                     return;
@@ -162,6 +192,7 @@ client.on('message', async (channel, tags, message, self) => {
                         const playerIsMod = tags.mod
                         const isStreamer = channel.slice(1).toLowerCase() === tags.username.toLowerCase();
                         const isCreator = tags.username.toLowerCase() === process.env.CREATOR_CHANNEL;
+			            const isModerator = await isBotModerator(client, channel);
                         //cooldown to avoid spammed commands from same user
                         const commandCooldown = cooldowns[tags.username][channel];
                         if (commandCooldown && currentTime - commandCooldown < 3000) {
@@ -171,6 +202,10 @@ client.on('message', async (channel, tags, message, self) => {
                         //avoid blocked commands by user
                         if (await commands.isBlockedCommand(commandInstance, channel)) {
                             console.log(`Command ${command} is blocked in channel ${channel}`);
+                            return;
+                        }
+                        if (!isModerator && tags.username.toLowerCase() !== process.env.CREATOR_CHANNEL) {
+                            await sendMessage(client, channel, `Bot needs to be a moderator to use commands.`);
                             return;
                         }
                         //avoid mod commands to be executed by regular users.
@@ -184,10 +219,14 @@ client.on('message', async (channel, tags, message, self) => {
                         await info(`Command execute on channel: ${channel}`, `${playerIsMod ? `Mod: ` : isStreamer ? `Streamer: ` : `Viewer: `}${tags.username} has used the command: ${message}`);
                         let result = await commandInstance.execute(tags, channel, argument, client, await isBotModerator(client, channel));
                         if (result) {
+                            console.log(`Result: ${result}`);
+                            if (result.toLowerCase().includes("forbidden: 403")) {
+                                return;
+                            }
                             if (!commands.isAvoidTag(commandInstance)) {
                                 result += ` @${tags.username}`;
                             }
-                            await sendMessage(client, channel, result);
+                            await sendMessage(client, channel, result, commands.isEmoteCommand(commandInstance));
                         }
                         //console.log(`[Channel: ${channel}] ${isModerator ? `[Mod] ` : ``}Esportal_Bot: ${result}`);
                     } catch (e) {

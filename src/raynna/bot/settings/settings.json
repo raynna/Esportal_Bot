@@ -9,7 +9,34 @@
       "name": "Tiimwork"
     },
     "toggled": [
-      "month"
+      "month",
+      "delay"
+    ],
+    "font": "bold"
+  },
+  "28965201": {
+    "twitch": {
+      "channel": "masterpipe83",
+      "username": "masterpipe83"
+    },
+    "esportal": {
+      "id": 39444141,
+      "name": "masterpipe83"
+    },
+    "toggled": [
+      "month",
+      "bengt",
+      "delay",
+      "daman",
+      "evarizta",
+      "oojsan",
+      "hugge",
+      "punishd",
+      "rekoj",
+      "pani",
+      "punishdd",
+      "heaton",
+      "stakarn"
     ],
     "font": "bold"
   },
@@ -34,7 +61,35 @@
       "id": 14511747,
       "name": "War1aT"
     },
+    "toggled": [
+      "delay"
+    ],
+    "font": "bold"
+  },
+  "32768716": {
+    "twitch": {
+      "channel": "mrkingping_tv",
+      "username": "mrkingping_tv"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
     "toggled": [],
+    "font": "bold"
+  },
+  "35920345": {
+    "twitch": {
+      "channel": "extantovich",
+      "username": "Extantovich"
+    },
+    "esportal": {
+      "id": 77939747,
+      "name": "Extant"
+    },
+    "toggled": [
+      "delay"
+    ],
     "font": "bold"
   },
   "37452555": {
@@ -75,13 +130,42 @@
       "id": 889046928,
       "name": "HeatoN"
     },
-    "toggled": [],
+    "toggled": [
+      "bengt",
+      "delay"
+    ],
     "font": "bold"
   },
   "38689464": {
     "twitch": {
       "channel": "ralleball33",
       "username": "ralleball33"
+    },
+    "esportal": {
+      "id": 101741220,
+      "name": "Ralleball33"
+    },
+    "toggled": [
+      "delay"
+    ],
+    "font": "bold"
+  },
+  "44378791": {
+    "twitch": {
+      "channel": "graazer",
+      "username": "GRAAZER"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "45079326": {
+    "twitch": {
+      "channel": "femfetakameler",
+      "username": "femfetakameler"
     },
     "esportal": {
       "name": "",
@@ -96,10 +180,11 @@
       "username": "joakimxjansson"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 381582205,
+      "name": "joizy"
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   },
   "47847839": {
     "twitch": {
@@ -112,16 +197,45 @@
     },
     "toggled": []
   },
+  "52308612": {
+    "twitch": {
+      "channel": "aliciaamirandaa",
+      "username": "aliciaamirandaa"
+    },
+    "esportal": {
+      "id": 1454117758,
+      "name": "aliciaamirandaa"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
   "55038335": {
     "twitch": {
       "channel": "esportal",
       "username": "Esportal"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 35091752,
+      "name": "Tutsi"
     },
-    "toggled": []
+    "toggled": [
+      "faceit",
+      "faceitstats",
+      "month"
+    ],
+    "font": "bold"
+  },
+  "56321802": {
+    "twitch": {
+      "channel": "cazzius",
+      "username": "Cazzius"
+    },
+    "esportal": {
+      "id": 882260691,
+      "name": "Cazzius"
+    },
+    "toggled": [],
+    "font": "bold"
   },
   "60535075": {
     "twitch": {
@@ -135,6 +249,18 @@
     "toggled": [
       "dino"
     ],
+    "font": "bold"
+  },
+  "60790068": {
+    "twitch": {
+      "channel": "madgirl93",
+      "username": "MadGirl93"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": [],
     "font": "bold"
   },
   "61719148": {
@@ -158,7 +284,9 @@
       "id": 167071457,
       "name": "DaMan"
     },
-    "toggled": [],
+    "toggled": [
+      "delay"
+    ],
     "font": "bold"
   },
   "63232377": {
@@ -170,7 +298,20 @@
       "name": "",
       "id": -1
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
+  },
+  "63686505": {
+    "twitch": {
+      "channel": "shinygoldstarz",
+      "username": "SHINYGOLDSTARZ"
+    },
+    "esportal": {
+      "id": 351197654,
+      "name": "SHINYGOLDSTARZ"
+    },
+    "toggled": [],
+    "font": "bold"
   },
   "65381354": {
     "twitch": {
@@ -178,10 +319,11 @@
       "username": "Punishdd"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 97869349,
+      "name": "PunishD"
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
   },
   "65608762": {
     "twitch": {
@@ -199,6 +341,18 @@
     "twitch": {
       "channel": "empantv",
       "username": "empaNTV"
+    },
+    "esportal": {
+      "id": 86572000,
+      "name": "EmpaN69"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "74328310": {
+    "twitch": {
+      "channel": "gohhman",
+      "username": "Gohhman"
     },
     "esportal": {
       "name": "",
@@ -238,7 +392,45 @@
     },
     "esportal": {
       "id": 222915535,
-      "name": "DuckOnATruck"
+      "name": "BotOnATruck"
+    },
+    "toggled": [
+      "delay"
+    ],
+    "font": "bold"
+  },
+  "85955309": {
+    "twitch": {
+      "channel": "tjorbeno_o",
+      "username": "TjorbenO_o"
+    },
+    "esportal": {
+      "id": 108498709,
+      "name": "Tjorben"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "97446868": {
+    "twitch": {
+      "channel": "mrslaycs",
+      "username": "mRSLAYcs"
+    },
+    "esportal": {
+      "id": 1043283422,
+      "name": "mRSLAY"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "100076945": {
+    "twitch": {
+      "channel": "icec0ld_gg",
+      "username": "icec0ld_gg"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
     },
     "toggled": [],
     "font": "bold"
@@ -308,6 +500,33 @@
     "toggled": [],
     "font": "bold"
   },
+  "126612445": {
+    "twitch": {
+      "channel": "fridaboxer",
+      "username": "Fridaboxer"
+    },
+    "esportal": {
+      "id": 321740414,
+      "name": "Fridaboxer"
+    },
+    "toggled": [
+      "today",
+      "week"
+    ],
+    "font": "default"
+  },
+  "128735553": {
+    "twitch": {
+      "channel": "yrogaming",
+      "username": "YroGaming"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": [],
+    "font": "bold"
+  },
   "138185322": {
     "twitch": {
       "channel": "non1h",
@@ -336,25 +555,32 @@
       "month",
       "gather",
       "match",
-      "esportalbot",
       "cmd",
       "yesterday",
       "steam",
       "esportal",
-      "premier"
+      "premier",
+      "stakarn",
+      "evarizta",
+      "daman",
+      "heaton",
+      "rekoj",
+      "pani"
     ],
     "font": "bold"
   },
-  "141813151": {
+  "142415322": {
     "twitch": {
-      "channel": "diivan",
-      "username": "diivan"
+      "channel": "1tapforyou",
+      "username": "1tapforyou"
     },
     "esportal": {
-      "id": 389283394,
-      "name": "DeagleDiivan"
+      "id": 385957094,
+      "name": "1tapforyou"
     },
-    "toggled": [],
+    "toggled": [
+      "delay"
+    ],
     "font": "bold"
   },
   "142494422": {
@@ -393,21 +619,6 @@
     "toggled": [],
     "font": "bold"
   },
-  "148979949": {
-    "twitch": {
-      "channel": "hjelmm",
-      "username": "Hjelmm"
-    },
-    "esportal": {
-      "id": 374632316,
-      "name": "5X5X5"
-    },
-    "toggled": [
-      "month",
-      "delay"
-    ],
-    "font": "bold"
-  },
   "149354453": {
     "twitch": {
       "channel": "h3db4rg",
@@ -441,7 +652,9 @@
       "id": 31059629,
       "name": "Lossa"
     },
-    "toggled": [],
+    "toggled": [
+      "delay"
+    ],
     "font": "bold"
   },
   "156546552": {
@@ -453,7 +666,10 @@
       "id": 247684337,
       "name": "Errkkan"
     },
-    "toggled": [],
+    "toggled": [
+      "month",
+      "delay"
+    ],
     "font": "bold"
   },
   "158066083": {
@@ -462,10 +678,47 @@
       "username": "Barajohanna"
     },
     "esportal": {
+      "id": 314174805,
+      "name": "Barajohanna"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "167912945": {
+    "twitch": {
+      "channel": "sunic93",
+      "username": "Sunic93"
+    },
+    "esportal": {
+      "id": 1528705,
+      "name": "Sunic"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "174714600": {
+    "twitch": {
+      "channel": "asdflul2",
+      "username": "asdflul2"
+    },
+    "esportal": {
       "name": "",
       "id": -1
     },
-    "toggled": []
+    "toggled": [],
+    "font": "bold"
+  },
+  "176062850": {
+    "twitch": {
+      "channel": "woozcs",
+      "username": "WoozCS"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": [],
+    "font": "bold"
   },
   "180604126": {
     "twitch": {
@@ -473,10 +726,27 @@
       "username": "adamskiifn"
     },
     "esportal": {
-      "name": "",
-      "id": -1
+      "id": 388179796,
+      "name": "adamskii"
     },
-    "toggled": [],
+    "toggled": [
+      "månad",
+      "month"
+    ],
+    "font": "bold"
+  },
+  "181922323": {
+    "twitch": {
+      "channel": "tindracs",
+      "username": "tindracs"
+    },
+    "esportal": {
+      "id": 347427052,
+      "name": "tindra"
+    },
+    "toggled": [
+      "delay"
+    ],
     "font": "bold"
   },
   "189243698": {
@@ -489,6 +759,20 @@
       "id": -1
     },
     "toggled": []
+  },
+  "207305579": {
+    "twitch": {
+      "channel": "boffarjanne",
+      "username": "boffarjanne"
+    },
+    "esportal": {
+      "id": 234013027,
+      "name": "BoffarJanne"
+    },
+    "toggled": [
+      "month"
+    ],
+    "font": "bold"
   },
   "236546036": {
     "twitch": {
@@ -513,7 +797,9 @@
     },
     "toggled": [
       "esportal",
-      "steam"
+      "steam",
+      "month",
+      "delay"
     ],
     "font": "bold"
   },
@@ -527,22 +813,8 @@
       "name": "groweN"
     },
     "toggled": [
-      "dino"
-    ],
-    "font": "bold"
-  },
-  "461865375": {
-    "twitch": {
-      "channel": "1zukoo",
-      "username": "1Zukoo"
-    },
-    "esportal": {
-      "id": 991391006,
-      "name": "1Zukoo"
-    },
-    "toggled": [
-      "delay",
-      "news"
+      "dino",
+      "month"
     ],
     "font": "bold"
   },
@@ -555,7 +827,9 @@
       "id": 22983599,
       "name": "LasseMan"
     },
-    "toggled": [],
+    "toggled": [
+      "month"
+    ],
     "font": "bold"
   },
   "491679637": {
@@ -568,7 +842,8 @@
       "name": "Raynna"
     },
     "toggled": [
-      "month"
+      "month",
+      "delay"
     ],
     "font": "bold"
   },
@@ -605,6 +880,21 @@
       "id": 450444271,
       "name": "Maluwa"
     },
+    "toggled": [
+      "delay",
+      "month"
+    ],
+    "font": "bold"
+  },
+  "583564292": {
+    "twitch": {
+      "channel": "select_fn",
+      "username": "select_fn"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
     "toggled": [],
     "font": "bold"
   },
@@ -617,7 +907,9 @@
       "id": 1161229838,
       "name": "MelonMies"
     },
-    "toggled": [],
+    "toggled": [
+      "delay"
+    ],
     "font": "bold"
   },
   "674086738": {
@@ -634,6 +926,44 @@
     ],
     "font": "bold"
   },
+  "746055686": {
+    "twitch": {
+      "channel": "kloakbengt",
+      "username": "kloakbengt"
+    },
+    "esportal": {
+      "id": 22770380,
+      "name": "KloakBengt"
+    },
+    "toggled": [
+      "delay"
+    ],
+    "font": "bold"
+  },
+  "758066953": {
+    "twitch": {
+      "channel": "zimbawecs2",
+      "username": "ZimbaweCS2"
+    },
+    "esportal": {
+      "id": 1609110876,
+      "name": "Zyzz666"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "763425371": {
+    "twitch": {
+      "channel": "wenjifr",
+      "username": "wenjifr"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": [],
+    "font": "bold"
+  },
   "770380917": {
     "twitch": {
       "channel": "mribovic",
@@ -646,16 +976,80 @@
     "toggled": [],
     "font": "bold"
   },
-  "1015930937": {
+  "770392237": {
     "twitch": {
-      "channel": "nollettan",
-      "username": "Nollettan"
+      "channel": "oojsan",
+      "username": "OOJSAN"
+    },
+    "esportal": {
+      "name": "OOJSAN",
+      "id": 482139994
+    },
+    "toggled": [
+      "delay"
+    ],
+    "font": "bold"
+  },
+  "781474524": {
+    "twitch": {
+      "channel": "eddiedzo",
+      "username": "eddiedzo"
     },
     "esportal": {
       "name": "",
       "id": -1
     },
     "toggled": [],
+    "font": "bold"
+  },
+  "793804773": {
+    "twitch": {
+      "channel": "julianaacs",
+      "username": "JulianaaCS"
+    },
+    "esportal": {
+      "id": 1219397854,
+      "name": "Julianaa"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "881097329": {
+    "twitch": {
+      "channel": "ronjalovisah",
+      "username": "ronjalovisah"
+    },
+    "esportal": {
+      "id": 1471176450,
+      "name": "Ronjalovisah"
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "924244874": {
+    "twitch": {
+      "channel": "chippan222",
+      "username": "chippan222"
+    },
+    "esportal": {
+      "name": "",
+      "id": -1
+    },
+    "toggled": [],
+    "font": "bold"
+  },
+  "1045123817": {
+    "twitch": {
+      "channel": "jullevt7",
+      "username": "julleVT7"
+    },
+    "esportal": {
+      "id": 1311797589,
+      "name": "JulleVT7"
+    },
+    "toggled": [
+      "delay"
+    ],
     "font": "bold"
   }
 }

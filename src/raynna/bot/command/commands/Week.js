@@ -8,7 +8,7 @@ const {checkBannedPlayer} = require("../CommandUtils");
 class Week {
     constructor() {
         this.name = 'Week';
-        this.triggers = ['vecka'];
+        this.triggers = ['vecka', 'weekly'];
         this.settings = new Settings();
     }
 

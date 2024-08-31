@@ -103,7 +103,6 @@ async function checkMatches(client, connectedChannels, changedMatches) {
 
                 console.log(`Started gathers: ${startedGathers.length}, canceled gathers: ${canceledGathers.length}, completed gathers: ${completedGathers.length}`);
             }
-
             for (const { entries, gather } of canceledGathers) {
                 const channel = entries.twitch.channel;
                 console.log(`Channel in canceled gather: ${channel}`);
@@ -140,7 +139,7 @@ async function checkMatches(client, connectedChannels, changedMatches) {
                         const streamer = await players.find(player => player.username.toLowerCase() === username.toLowerCase());
                         const streamersTeam = streamer ? streamer.team : 'N/A';
                         const averageElo = streamersTeam === 1 ? `${team1_avg_elo}-${team2_avg_elo}` : `${team2_avg_elo}-${team1_avg_elo}`;
-                        const result = `${username} started a match: ${mapName}, Avg ratings: ${averageElo}`;
+                        const result = `${username} started a match 30 seconds ago: ${mapName}, Avg ratings: ${averageElo}`;
                         await sendMessage(client, channel, result);
                     } else {
                         console.log(`${gather.name} : ${matchError}`);
@@ -179,7 +178,7 @@ async function checkMatches(client, connectedChannels, changedMatches) {
                             const { data: recentMatch, errorMessage: recentMatchError } = await getData(RequestType.RecentMatches, userId);
 
                             if (recentMatchError) {
-                                result = `${username} just ${matchResult} a match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsRatio}%, K/D: ${ratio}, MVP: ${mvp.username}`;
+                                result = `${username} ${matchResult} a match 30 seconds ago: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsRatio}%, K/D: ${ratio}, MVP: ${mvp.username}`;
                                 console.log(`Error on getting recent match on completed match.`, recentMatchError);
                                 await sendMessage(client, channel, result);
                             } else {
@@ -187,7 +186,7 @@ async function checkMatches(client, connectedChannels, changedMatches) {
                                 const newElo = elo + elo_change;
                                 const newRank = await calculateRank(newElo);
                                 const eloString = elo_change && elo_change !== 0 ? ` (${elo_change > 0 ? `+` : ``}${elo_change})` : ``;
-                                result = `${username} just ${matchResult}${eloString} a match: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsRatio}%, K/D: ${ratio}, MVP: ${mvp.username}`;
+                                result = `${username} ${matchResult}${eloString} a match 30 seconds ago: ${mapName} (${displayScore}), Kills: ${kills}, Deaths: ${deaths}, Assists: ${assists}, HS: ${hsRatio}%, K/D: ${ratio}, MVP: ${mvp.username}`;
                                 await sendMessage(client, channel, result);
 
                                 if (rank !== newRank) {
@@ -279,7 +278,7 @@ async function checkGatherList(client, connectedChannels) {
                     const waiting = players.length - picked_players;
                     const isCreator = creator.id === userId;
                     let result;
-                    const gatherResult = isCreator ? "started a gather lobby" : `joined ${creator.username}'s gather lobby`;
+                    const gatherResult = isCreator ? "started a gather lobby 30 seconds ago" : `joined ${creator.username}'s gather lobby 30 seconds ago`;
                     if (isModerator) {
                         result = `${username} ${gatherResult}: https://www.esportal.com/sv/gather/${id} ${mapName}, Waiting: ${waiting}, Picked: ${picked_players}/10`;
                     } else {
@@ -500,7 +499,7 @@ async function changeFont(text, channel) {
         let isLink = false;
         let isTag = false;
         let isEmote = false;
-        let emotes = ["DinoDance", "Kappa"];
+        let emotes = ["DinoDance", "Kappa", "TwitchConHYPE", "damang4Zoom"];
         return text.split('').map((char, index) => {
             if (text.length - 1 === index && (char === ' ' || char === '\n')) {
                 return '';
@@ -525,7 +524,7 @@ async function changeFont(text, channel) {
 let lastMessageTime = 0;
 let messageCount = 0;
 
-async function sendMessage(client, channel, message) {
+async function sendMessage(client, channel, message, skipFont = false) {
     try {
         const currentTime = Date.now();
         const timeElapsed = currentTime - lastMessageTime;
@@ -545,7 +544,11 @@ async function sendMessage(client, channel, message) {
         lastMessageTime = currentTime;
         if (message) {
             console.log(`[Channel: ${channel}]`, `[Esportal_Bot]`, message);
-            await client.say(channel, await changeFont(message, channel));
+            if (skipFont) {
+                await client.say(channel, message);
+            } else {
+                await client.say(channel, await changeFont(message, channel));
+            }
         }
     } catch (error) {
         console.error(error);
